@@ -63,7 +63,8 @@ class AsciiMovie(object):
         self.frame_intervals = []
 
     def _play_gif(self, fps=15, repeats=1):
-        playSequence(self.sequence, fps, repeats)
+        for i in range(repeats):
+            playSequence(self.sequence, fps)
 
     def _play_movie(self, fps=15, repeats=1):
         for i in range(repeats):
@@ -167,11 +168,10 @@ def generateSequence(imageseq, scalefactor=0.1, lut_type='uniform'):
 def playSequence(seq, fps=30, repeats=1):
     shape = seq[0].size
     set_terminal_size(shape)
-    for repeat in range(repeats):
-        for im in seq:
-            clear_term()
-            print(im)
-            time.sleep(1.0/fps)
+    for im in seq:
+        clear_term()
+        print(im)
+        time.sleep(1.0/fps)
 
 
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
     """ SINGLE IMAGE
     img = "/home/derricw/Images/1367475599016.jpg"
-    text = AsciiImage(img,lut_type='uniform')
+    text = AsciiImage(img)
     print text
     print text.size
     print text.derp

@@ -77,7 +77,7 @@ def image_to_ascii(img, scalefactor=0.1, invert=False, equalize=True):
     return text
 
 
-def pil_to_ascii(img, scalefactor=0.1, invert=False, equalize=True):
+def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     """
     Generates an ascii string from a PIL image.
 
@@ -132,7 +132,7 @@ def pil_to_ascii(img, scalefactor=0.1, invert=False, equalize=True):
     return text
 
 
-def numpy_to_ascii(img, scalefactor=0.1, invert=False, equalize=True):
+def numpy_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     """
     Generates and ascii string from a numpy image.
 
