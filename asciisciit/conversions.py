@@ -115,7 +115,7 @@ def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     if invert:
         img = ImageOps.invert(img)
 
-    text=""
+    text="\n"
 
     ##TODO: custom LUT
     lut = GREYSCALE_UNIFORM
@@ -152,7 +152,7 @@ def numpy_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     if not invert:
         img = 255-img
 
-    text=""
+    text="\n"
 
     lut = GREYSCALE_UNIFORM
 

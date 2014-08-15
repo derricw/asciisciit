@@ -21,6 +21,7 @@ if "linux" in platform.system().lower():
 else:
     from windows_backend import *
 
+
 class AsciiImage(object):
 
     def __init__(self, *args, **kwargs):
@@ -33,7 +34,7 @@ class AsciiImage(object):
         if name == "size":
             lines = self.data.split("\n")
             rows = len(lines)
-            columns = len(lines[0])
+            columns = len(lines[1])
             return (rows, columns)
         else:
             return object.__getattribute__(self, name)
@@ -161,7 +162,7 @@ class AsciiCamera(object):
 def generateSequence(imageseq, scalefactor=0.1, lut_type='uniform'):
     seq = []
     for im in imageseq:
-        seq.append(AsciiImage(im,scalefactor,lut_type))
+        seq.append(AsciiImage(im, scalefactor, lut_type))
     return seq
 
 
@@ -176,39 +177,4 @@ def playSequence(seq, fps=30, repeats=1):
 
 
 if __name__ == '__main__':
-
-    """ SINGLE IMAGE
-    img = "/home/derricw/Images/1367475599016.jpg"
-    text = AsciiImage(img)
-    print text
-    print text.size
-    print text.derp
-    """
-    """ GIF
-    #gif_to_convert = "/home/derricw/Pictures/2zHFLFx.gif"
-    gif_to_convert = r"C:\Users\derricw\Pictures\wrestler.gif"
-    
-    movie = AsciiMovie(gif_to_convert, scalefactor=0.5)
-    movie.play(repeats=4)
-
-    """
-    """ MATPLOTLIB PLOT
-    import matplotlib.pyplot as plt
-    f = plt.figure()
-    x = np.arange(0,10,0.1)
-    y = np.sin(x)
-    plt.plot(x,y, linewidth=5.0)
-    #plt.axis("off")
-    ascii_fig = figure_to_ascii(f)
-    print ascii_fig
-    """
-    #""" MOVIE
-    movie_path = "/home/derricw/Downloads/20131014 GomSweater.mp4"
-    movie = AsciiMovie(movie_path, scalefactor=0.15)
-    movie.play(fps=30.0)
-    #"""
-
-    """ WEBCAM
-    movie = AsciiCamera(0, scalefactor=0.20)
-    movie.stream(fps=15.0)
-    """
+    pass

@@ -2,6 +2,8 @@
 
 windows_backend.py
 
+@author: derricw
+
 Windows support functions.
 
 """
@@ -9,9 +11,9 @@ Windows support functions.
 import os
 
 
-
 def clear_term():
     os.system("cls")
+
 
 def set_terminal_size(size):
     try:
@@ -23,7 +25,7 @@ def set_terminal_size(size):
 
 
 def new_term(command, size=None):
-    assert False
+    os.system("start %s" % command)
 
 if __name__ == '__main__':
-    new_term("TEST")
+    pass
