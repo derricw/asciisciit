@@ -1,11 +1,12 @@
 '''
-ASCII Art maker
-Creates an ascii art image from an arbitrary image
-Created on 7 Sep 2009
+
+ASCII Toolbox for Converting Images, Movies, Gifs, and Video Feed
+
+Created on 14 Aug 2014
 
 @author: Derric Williams
-'''
 
+'''
 
 import time
 import os
@@ -23,9 +24,35 @@ else:
 
 
 class AsciiImage(object):
+    """
+    An image representation of single frame or image file.
 
-    def __init__(self, *args, **kwargs):
-        self.data = image_to_ascii(*args, **kwargs)
+    Parameters
+    ----------
+    image : str, np.ndarray, PIL.Image
+        Image to convert to text
+    scalefactor : float
+        Scale factor for image.  Units are chars/pixel, automatically adjusted
+        for the rectangular-ness of characters.
+    invert : bool
+        Whether to invert the intensity values
+    equalize : True
+        Equalize the image histogram to increase contrast.  I suggest always
+        setting this to true.
+
+    Returns
+    -------
+    AsciiImage
+
+    Examples
+    --------
+
+    >>> ascii = AsciiImage('rubyrhod.jpeg')
+    >>> print(ascii)
+
+    """
+    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True):
+        self.data = image_to_ascii(image, scalefactor, invert, equalize)
 
     def __repr__(self):
         return self.data
@@ -56,7 +83,7 @@ class AsciiMovie(object):
                 self.sequence = generateSequence(data, scalefactor=scalefactor)
                 self.shape = data.shape
                 self.play = self._play_gif
-            elif ext == ".mp4":
+            elif ext in  [".mp4", ".avi"]:
                 self.play = self._play_movie
         else:
             raise("movie_path must be a string")
@@ -64,15 +91,21 @@ class AsciiMovie(object):
         self.frame_intervals = []
 
     def _play_gif(self, fps=15, repeats=1):
-        for i in range(repeats):
-            playSequence(self.sequence, fps)
+        if repeats < 0:
+            while True:
+                playSequence(self.sequence, fps)
+        else:
+            for i in range(repeats):
+                playSequence(self.sequence, fps)
 
     def _play_movie(self, fps=15, repeats=1):
+        if repeats < 0:
+            repeats = 1  # lets just play movies once by default
         for i in range(repeats):
             self.video = cv2.VideoCapture(self.movie_path)
             frame = 0
+            t = time.clock()
             while 1:
-                t = time.clock()
                 result, image = self.video.read()
                 if type(image) != np.ndarray:
                     print("End of movie.")
@@ -88,11 +121,14 @@ class AsciiMovie(object):
                             pass
                     clear_term()
                     print(ascii_img)
-                    time.sleep(1.0/fps)
                     frame += 1
                 else:
                     break
                 interval = time.clock()-t
+                t = time.clock()
+                remaining = 1.0/fps-interval
+                if remaining > 0:
+                    time.sleep(remaining)
                 self.frame_intervals.append(interval)
             print("Total frames displayed:", frame)
             print("Avg frame interval:", np.mean(self.frame_intervals))
@@ -125,8 +161,8 @@ class AsciiCamera(object):
 
     def stream(self, fps=15.0):
         frame = 0
+        t = time.clock()
         while 1:
-            t = time.clock()
             result, image = self.video.read()
             if type(image) != np.ndarray:
                 if frame == 0:
@@ -145,11 +181,14 @@ class AsciiCamera(object):
                         pass
                 clear_term()
                 print(ascii_img)
-                time.sleep(1.0/fps)
                 frame += 1
             else:
                 break
             interval = time.clock()-t
+            t = time.clock()
+            remaining = 1.0/fps-interval
+            if remaining > 0:
+                time.sleep(remaining)
             self.frame_intervals.append(interval)
         print("Total frames displayed:", frame)
         print("Avg frame interval:", np.mean(self.frame_intervals))
@@ -159,20 +198,24 @@ class AsciiCamera(object):
         self.video.release()
 
 
-def generateSequence(imageseq, scalefactor=0.1, lut_type='uniform'):
+def generateSequence(imageseq, scalefactor=0.1):
     seq = []
     for im in imageseq:
-        seq.append(AsciiImage(im, scalefactor, lut_type))
+        seq.append(AsciiImage(im, scalefactor))
     return seq
 
 
 def playSequence(seq, fps=30, repeats=1):
     shape = seq[0].size
     set_terminal_size(shape)
+    t = time.clock()
     for im in seq:
         clear_term()
         print(im)
-        time.sleep(1.0/fps)
+        interval = time.clock()-t
+        remaining = 1.0/fps-interval
+        if remaining > 0:
+            time.sleep(remaining)
 
 
 

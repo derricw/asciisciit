@@ -29,12 +29,11 @@ def new_term(command, size=None):
     """
     if size:
         width, height = size
-        os.system("gnome-terminal --geometry %sx%s -e 'bash -c \"%s\"'" %
-                  (width, height, command))
+        os.system("gnome-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
+                  (width+1, height+3, command))
     else:
-        os.system("gnome-terminal -e 'bash -c \"%s\"'" % (command))
+        os.system("gnome-terminal -e 'bash -c \"python %s\"'" % (command))
 
 
 if __name__ == '__main__':
-    command = "python asciiart.py"
-    new_term(command, (180,55))
+    pass

@@ -25,6 +25,10 @@ def set_terminal_size(size):
 
 
 def new_term(command, size=None):
+    """
+    the window set_terminal_size works so we don't 
+        have to do anything with the size
+    """
     os.system("start %s" % command)
 
 if __name__ == '__main__':
