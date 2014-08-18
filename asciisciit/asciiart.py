@@ -13,7 +13,6 @@ import os
 import platform
 from subprocess import Popen, PIPE
 import cv2
-from PIL import Image, ImageOps
 import numpy as np
 
 from conversions import *
@@ -31,7 +30,7 @@ class AsciiImage(object):
     Parameters
     ----------
     image : str, np.ndarray, PIL.Image
-        Image to convert to text
+        Image to convert to text.  Can be file path, numpy array, or PIL image
     scalefactor : float
         Scale factor for image.  Units are chars/pixel, automatically adjusted
         for the rectangular-ness of characters.
@@ -70,7 +69,12 @@ class AsciiImage(object):
         img = ascii_to_pil(self.data, font_size, bg_color, fg_color)
         img.save(path)
 
-    def show(self):
+    def show(self, resize_term=False):
+        if resize_term:
+            try:
+                set_terminal_size(self.size)
+            except:
+                pass
         print(self.data)
 
 
@@ -81,7 +85,7 @@ class AsciiMovie(object):
     Parameters
     ----------
     movie_path : str
-        File path for movie
+        File path or web address for movie.
     scalefactor : float
         Scale of the image in chars / pixel
     invert : bool
@@ -90,7 +94,7 @@ class AsciiMovie(object):
     Examples
     --------
 
-    
+    >>> movie = AsciiMovie('')
 
     """
 
@@ -322,6 +326,7 @@ def playSequence(seq, fps=30, repeats=1):
         clear_term()
         print(im)
         interval = time.clock()-t
+        t = time.clock()
         remaining = 1.0/fps-interval
         if remaining > 0:
             time.sleep(remaining)

@@ -54,10 +54,10 @@ def main():
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()
     args = vars(args)
-    print args
+    print(args)
     #new terminal
     if args['n']:
-        call = sys.argv.remove("--n")
+        sys.argv.remove("--n")
         call_str = " ".join(sys.argv)
 
         #have to get the size here because we have to set linux terminal size
@@ -114,7 +114,7 @@ def main():
                     task.render(args['outfile'],
                                 font_size=args['p'])
                 else:
-                    print(task)
+                    task.show()
                     raw_input("")
             else:
                 print("Unknown file format.Try:", MOVIES+IMAGES+GIFS)

@@ -18,8 +18,11 @@ def clear_term():
 def set_terminal_size(size):
     try:
         width, height = size
-        size_str = "mode %s,%s" % (height+1, width+1)
-        os.system(size_str)
+        #size_str = "mode %s,%s" % (height+1, width+1)
+        cols_str = "mode con: cols=%s" % (height+1)
+        rows_str = "mode con: lines=%s" % (width+1)
+        os.system(cols_str)
+        os.system(rows_str)
     except Exception as e:
         print("Failed to scale window: %s" % e)
 
