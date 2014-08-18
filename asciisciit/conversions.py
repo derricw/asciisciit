@@ -8,12 +8,13 @@ Bunch of random conversion functions.
 
 """
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 import numpy as np
 from bisect import bisect
 import random
 import cv2
 import matplotlib.pyplot as plt
+from misc import *
 
 
 GREYSCALE_RANDOM = [
@@ -131,6 +132,53 @@ def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
 
     return text
 
+def ascii_to_pil(text, bg_color=(20,20,20), fg_color=(255,255,255)):
+    font = ImageFont.load_default()
+    font_width, font_height = font.getsize(" ")  # shape of 1 char
+
+    img_height, img_width = get_ascii_image_size(text)
+
+    out_img = np.zeros((font_height*img_height, font_width*img_width, 3),
+        dtype=np.uint8)
+    out_img[:,:,0]+=bg_color[0]
+    out_img[:,:,1]+=bg_color[1]
+    out_img[:,:,2]+=bg_color[2]
+
+    img = Image.fromarray(out_img)
+    draw = ImageDraw.Draw(img)
+
+    for index,line in enumerate(text.split("\n")):
+        y = (font_height)*index
+        draw.text((0,y),line,fg_color,font=font)
+    return img
+
+
+def ascii_seq_to_gif(seq, output_path, fps=15.0):
+    try:
+        from images2gif import writeGif
+    except ImportError as e:
+        raise RuntimeError("Writing gifs requires images2gif library.\nTry 'pip install images2gif' %s" % e)
+
+    images = []
+
+    status = StatusBar(len(seq), text="Generating frames: ",)
+
+    for index,ascii_img in enumerate(seq):
+        if type(ascii_img) == str:
+            #raw text
+            text = ascii_img
+        else:
+            #AsciiImage instance
+            text = ascii_img.data
+        images.append(ascii_to_pil(text))
+        status.update(index)
+
+    status.complete()
+
+    duration = 1.0/fps
+
+    writeGif(output_path, images, duration)
+
 
 def numpy_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     """
@@ -187,7 +235,12 @@ def gif_to_numpy(gif_path):
     Converts a GIF into a numpy movie.
     """
     gif = Image.open(gif_path)
+    length = get_length_of_gif(gif)
+
     size = gif.size
+    
+    status = StatusBar(length, "Reading frames: ")
+
     frames = []
     frame_count = 0
     while gif:
@@ -199,6 +252,12 @@ def gif_to_numpy(gif_path):
             gif.seek(frame_count)
         except EOFError:
             break
+        status.update(frame_count)
+
+    status.complete()
+
+    assert(length==len(frames))
+
     final_frame_count = len(frames)
     frame1 = np.array(frames[0])
     shape = frame1.shape
@@ -227,14 +286,4 @@ def figure_to_ascii(mpl_figure):
 
 
 if __name__ == '__main__':
-    
-    path = "/home/derricw/Pictures/derricwcats.jpg"
-
-    ascii = image_to_ascii(path)
-
-    print ascii
-
-    img = image_to_numpy(path)
-    ascii = numpy_to_ascii(img, scalefactor=0.1)
-    print ascii
-
+    pass

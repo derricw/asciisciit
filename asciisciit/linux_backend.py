@@ -7,7 +7,7 @@ Linux support functions.
 """
 
 import os
-
+import commands
 
 def clear_term():
     print(chr(27) + "[2J")
@@ -29,8 +29,16 @@ def new_term(command, size=None):
     """
     if size:
         width, height = size
-        os.system("gnome-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
-                  (width+1, height+3, command))
+        # do they have gnome terminal?
+        if commands.getoutput("which gnome-terminal"):
+            os.system("gnome-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
+                      (width+1, height+3, command))
+        elif commands.getoutput("which xfce4-terminal"):
+            os.system("xfce4-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
+                      (width+1, height+3, command))
+        elif commands.getoutput("which konsole"):
+            os.system("konsole --fullscreen -e 'bash -c \"python %s\"'" %
+                      (command))
     else:
         os.system("gnome-terminal -e 'bash -c \"python %s\"'" % (command))
 

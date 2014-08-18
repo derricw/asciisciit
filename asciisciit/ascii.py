@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 
 ascii.py
@@ -30,7 +31,11 @@ else:
 from asciiart import *
 from misc import *
 
-if __name__ == '__main__':
+MOVIES = [".mp4", '.avi', '.mpg', '.mpeg']
+IMAGES = ['.png', '.jpeg', '.jpg', '.tif', '.bmp']
+GIFS = ['.gif']
+
+def main():
     parser = argparse.ArgumentParser(
         description='Convert Images, Movies, Gifs, Plots to ASCII')
     parser.add_argument('infile', nargs='?', type=str)
@@ -47,28 +52,28 @@ if __name__ == '__main__':
     parser.add_argument('-f', type=float, help='Target FPS', default=15.0)
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()
-    args_dict = vars(args)
-    print args_dict
+    args = vars(args)
+    print args
     #new terminal
-    if args_dict['n']:
+    if args['n']:
         call = sys.argv.remove("--n")
         call_str = " ".join(sys.argv)
 
         #have to get the size here because we have to set linux terminal size
         #   when we instantiate the terminal because i can't figure out how
         #   to do it after the terminal is created like we do in Winderps
-        sf = args_dict['s']
-        if args_dict['w'] > -1:
-            size = get_movie_size_pix(args_dict['w'])
+        sf = args['s']
+        if args['w'] > -1:
+            size = get_movie_size_pix(args['w'])
             
-        elif args_dict['infile']:
-            infile = args_dict['infile']
+        elif args['infile']:
+            infile = args['infile']
             _,ext = os.path.splitext(infile)
-            if ext in [".mp4",'.avi']:
+            if ext in MOVIES:
                 size = get_movie_size_pix(infile)
-            elif ext in ['.gif']:
+            elif ext in GIFS:
                 size = get_gif_size_pix(infile)
-            elif ext in ['.jpeg','.png','.jpg','.tif']:
+            elif ext in IMAGES:
                 size = get_img_size_pix(infile)
             else:
                 size = None
@@ -77,27 +82,44 @@ if __name__ == '__main__':
         if size:
             size = (int(size[0]*sf), int(size[1]*sf*ASPECTCORRECTIONFACTOR))
 
-        new_term(call_str,size)  # call in new terminal without --n argument
+        new_term(call_str, size)  # call in new terminal without --n argument
+
     #same terminal
     else:
+
         #a file to open?
-        if args_dict['infile']:
-            _,ext = os.path.splitext(args_dict['infile'])
-            if ext in [".gif", ".mp4", '.avi']:
-                task = AsciiMovie(args_dict['infile'],
-                                  scalefactor=args_dict['s'],
-                                  invert=args_dict['i'])
-                task.play(repeats=args_dict['r'],
-                          fps=args_dict['f'])
-            elif ext in ['.png', '.jpeg', '.jpg', '.tif']:
-                task = AsciiImage(args_dict['infile'],
-                                  scalefactor=args_dict['s'],
-                                  invert=args_dict['i'],
-                                  equalize=args_dict['e'])
-                print(task)
+        if args['infile']:
+            _,ext = os.path.splitext(args['infile'])
+            if ext in MOVIES+GIFS:
+                task = AsciiMovie(args['infile'],
+                                  scalefactor=args['s'],
+                                  invert=args['i'])
+                if args['outfile']:
+                    task.render(args['outfile'])
+                else:
+                    task.play(repeats=args['r'],
+                              fps=args['f'])
+                    raw_input("")
+            elif ext in IMAGES:
+                task = AsciiImage(args['infile'],
+                                  scalefactor=args['s'],
+                                  invert=args['i'],
+                                  equalize=args['e'])
+                if args['outfile']:
+                    task.render(args['outfile'],
+                                fps=args['f'])
+                else:
+                    print(task)
+                    raw_input("")
+            else:
+                print("Unknown file format.Try:", MOVIES+IMAGES+GIFS)
+
         #a webcam?
-        elif args_dict['w'] > -1:
-            task = AsciiCamera(args_dict['w'],
-                               scalefactor=args_dict['s'],
-                               invert=args_dict['i'])
-            task.stream(fps=args_dict['f'])
+        elif args['w'] > -1:
+            task = AsciiCamera(args['w'],
+                               scalefactor=args['s'],
+                               invert=args['i'])
+            task.stream(fps=args['f'])
+
+if __name__ == '__main__':
+    main()

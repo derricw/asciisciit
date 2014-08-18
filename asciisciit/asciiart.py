@@ -52,6 +52,7 @@ class AsciiImage(object):
 
     """
     def __init__(self, image, scalefactor=0.1, invert=False, equalize=True):
+
         self.data = image_to_ascii(image, scalefactor, invert, equalize)
 
     def __repr__(self):
@@ -59,15 +60,36 @@ class AsciiImage(object):
 
     def __getattribute__(self, name):
         if name == "size":
-            lines = self.data.split("\n")
-            rows = len(lines)
-            columns = len(lines[1])
-            return (rows, columns)
+            return get_ascii_image_size(self.data)
         else:
             return object.__getattribute__(self, name)
 
+    def to_file(self, path):
+        with open(path, "w+") as f:
+            f.write(self.data)
+
+    def render(self, path, bg_color=(20,20,20), fg_color=(255,255,255)):
+        img = ascii_to_pil(self.data, bg_color, fg_color)
+        img.save(path)
+
+    def show(self):
+        print(self.data)
+
 
 class AsciiMovie(object):
+    """
+    Movie object for playing and rendering movies.
+
+    Parameters
+    ----------
+    movie_path : str
+        File path for movie
+    scalefactor : float
+        Scale of the image in chars / pixel
+    invert : bool
+        Invert image before processing
+
+    """
 
     def __init__(self, movie_path, scalefactor=0.2, invert=False):
         self.movie_path = movie_path
@@ -79,34 +101,37 @@ class AsciiMovie(object):
             _,ext = os.path.splitext(self.movie_path)
 
             if ext == ".gif":
-                data = gif_to_numpy(self.movie_path)
-                self.sequence = generateSequence(data, scalefactor=scalefactor)
-                self.shape = data.shape
+                self.data = gif_to_numpy(self.movie_path)
+                self.shape = self.data.shape
                 self.play = self._play_gif
+                self.render = self._render_to_gif
             elif ext in  [".mp4", ".avi"]:
                 self.play = self._play_movie
+                self.render = self._render_to_movie
         else:
             raise("movie_path must be a string")
 
         self.frame_intervals = []
+        self.draw_times = []
 
     def _play_gif(self, fps=15, repeats=1):
+        seq = generateSequence(self.data, scalefactor=self.scalefactor)
         if repeats < 0:
             while True:
-                playSequence(self.sequence, fps)
+                playSequence(seq, fps)
         else:
             for i in range(repeats):
-                playSequence(self.sequence, fps)
+                playSequence(seq, fps)
 
     def _play_movie(self, fps=15, repeats=1):
         if repeats < 0:
             repeats = 1  # lets just play movies once by default
         for i in range(repeats):
-            self.video = cv2.VideoCapture(self.movie_path)
+            video = cv2.VideoCapture(self.movie_path)
             frame = 0
             t = time.clock()
             while 1:
-                result, image = self.video.read()
+                result, image = video.read()
                 if type(image) != np.ndarray:
                     print("End of movie.")
                     break
@@ -124,27 +149,91 @@ class AsciiMovie(object):
                     frame += 1
                 else:
                     break
-                interval = time.clock()-t
+                draw_time = time.clock()-t
                 t = time.clock()
-                remaining = 1.0/fps-interval
+                remaining = 1.0/fps-draw_time
                 if remaining > 0:
                     time.sleep(remaining)
+                    interval = draw_time+remaining
+                else:
+                    interval = draw_time
                 self.frame_intervals.append(interval)
+                self.draw_times.append(draw_time)
+
             print("Total frames displayed:", frame)
+            print("Avg draw time:", np.mean(self.draw_times))
             print("Avg frame interval:", np.mean(self.frame_intervals))
             print("Max frame interval:", np.max(self.frame_intervals))
             print("Min frame interval:", np.min(self.frame_intervals))
 
-            self.video.release()
+            video.release()
 
-    def render(self, output_path, fourcc=None, fps=15):
-        pass
+    def _render_to_gif(self, output_path):
+        """
+        Render text to gif of text.
 
-    def _render_gif(self):
-        pass
+        Parameters
+        ----------
+        output_path : str
+            Where to write the gif.
 
-    def _render_movie(self):
-        pass
+        """
+        seq = generateSequence(self.data, scalefactor=self.scalefactor)
+        ascii_seq_to_gif(seq, output_path)
+
+    def _render_to_movie(self, output_path, fourcc=None, fps=15):
+        """
+
+        """
+        video = cv2.VideoCapture(self.movie_path)
+        frames = 0
+        
+        status = StatusBar(text='Counting frames: ')
+
+        #get # of frames and img size
+        while 1:
+            result, frame = video.read()
+            if type(frame) != np.ndarray:
+                break
+            if frames == 0:
+                #get resulting image size once
+                ascii_img = AsciiImage(frame, scalefactor=self.scalefactor,
+                       invert=self.invert)
+                pil_img = ascii_to_pil(ascii_img.data)
+                img_size = pil_img.size
+            frames += 1
+            status.update_custom(frames)
+        video.release()
+
+        status.complete()
+
+        status = StatusBar(frames, "Rendering frames: ")
+
+        video = cv2.VideoCapture(self.movie_path)
+
+        if not fourcc:
+            fourcc = fourcc = cv2.cv.CV_FOURCC(*'MPEG')
+        output = cv2.VideoWriter(output_path, -1, fps, img_size, 1)
+
+        for i in range(frames):
+            result, frame = video.read()
+            if type(frame) != np.ndarray:
+                break
+            if result:
+                ascii_img = AsciiImage(frame, scalefactor=self.scalefactor,
+                                       invert=self.invert)
+                pil_img = ascii_to_pil(ascii_img.data)
+                numpy_img = np.array(pil_img)
+                output.write(numpy_img)
+                status.update(i)
+            else:
+                break
+
+        status.complete()
+
+        video.release()
+        output.release()
+
 
 
 class AsciiCamera(object):
@@ -158,6 +247,7 @@ class AsciiCamera(object):
         self.video = cv2.VideoCapture(self.camera_id)
 
         self.frame_intervals = []
+        self.draw_times = []
 
     def stream(self, fps=15.0):
         frame = 0
@@ -184,13 +274,19 @@ class AsciiCamera(object):
                 frame += 1
             else:
                 break
-            interval = time.clock()-t
+            draw_time = time.clock()-t
             t = time.clock()
-            remaining = 1.0/fps-interval
+            remaining = 1.0/fps-draw_time
             if remaining > 0:
                 time.sleep(remaining)
+                interval = draw_time+remaining
+            else:
+                interval = draw_time
             self.frame_intervals.append(interval)
+            self.draw_times.append(draw_time)
+
         print("Total frames displayed:", frame)
+        print("Avg draw time:", np.mean(self.draw_times))
         print("Avg frame interval:", np.mean(self.frame_intervals))
         print("Max frame interval:", np.max(self.frame_intervals))
         print("Min frame interval:", np.min(self.frame_intervals))
