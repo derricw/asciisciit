@@ -69,6 +69,7 @@ def main():
         elif args['infile']:
             infile = args['infile']
             _,ext = os.path.splitext(infile)
+            ext = ext.lower()
             if ext in MOVIES:
                 size = get_movie_size_pix(infile)
             elif ext in GIFS:
@@ -90,12 +91,14 @@ def main():
         #a file to open?
         if args['infile']:
             _,ext = os.path.splitext(args['infile'])
+            ext = ext.lower()
             if ext in MOVIES+GIFS:
                 task = AsciiMovie(args['infile'],
                                   scalefactor=args['s'],
                                   invert=args['i'])
                 if args['outfile']:
-                    task.render(args['outfile'])
+                    task.render(args['outfile'],
+                                fps=args['f'])
                 else:
                     task.play(repeats=args['r'],
                               fps=args['f'])
@@ -106,8 +109,7 @@ def main():
                                   invert=args['i'],
                                   equalize=args['e'])
                 if args['outfile']:
-                    task.render(args['outfile'],
-                                fps=args['f'])
+                    task.render(args['outfile'])
                 else:
                     print(task)
                     raw_input("")
