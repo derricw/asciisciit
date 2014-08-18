@@ -11,6 +11,7 @@ Created on 14 Aug 2014
 import time
 import os
 import platform
+from subprocess import Popen, PIPE
 import cv2
 from PIL import Image, ImageOps
 import numpy as np
@@ -40,9 +41,6 @@ class AsciiImage(object):
         Equalize the image histogram to increase contrast.  I suggest always
         setting this to true.
 
-    Returns
-    -------
-    AsciiImage
 
     Examples
     --------
@@ -68,8 +66,8 @@ class AsciiImage(object):
         with open(path, "w+") as f:
             f.write(self.data)
 
-    def render(self, path, bg_color=(20,20,20), fg_color=(255,255,255)):
-        img = ascii_to_pil(self.data, bg_color, fg_color)
+    def render(self, path, font_size=10, bg_color=(20,20,20), fg_color=(255,255,255)):
+        img = ascii_to_pil(self.data, font_size, bg_color, fg_color)
         img.save(path)
 
     def show(self):
@@ -88,6 +86,11 @@ class AsciiMovie(object):
         Scale of the image in chars / pixel
     invert : bool
         Invert image before processing
+
+    Examples
+    --------
+
+    
 
     """
 
@@ -168,7 +171,7 @@ class AsciiMovie(object):
 
             video.release()
 
-    def _render_to_gif(self, output_path):
+    def _render_to_gif(self, output_path, font_size=10):
         """
         Render text to gif of text.
 
@@ -179,9 +182,10 @@ class AsciiMovie(object):
 
         """
         seq = generateSequence(self.data, scalefactor=self.scalefactor)
-        ascii_seq_to_gif(seq, output_path)
+        ascii_seq_to_gif(seq, output_path, font_size=font_size)
 
-    def _render_to_movie(self, output_path, fourcc=None, fps=15):
+    def _render_to_movie(self, output_path, fourcc=None, fps=24,
+                         font_size=10):
         """
 
         """
@@ -207,13 +211,20 @@ class AsciiMovie(object):
 
         status.complete()
 
-        status = StatusBar(frames, "Rendering frames: ")
+        #status = StatusBar(frames, "Rendering frames: ")
 
         video = cv2.VideoCapture(self.movie_path)
 
-        if not fourcc:
-            fourcc = fourcc = cv2.cv.CV_FOURCC(*'MPEG')
-        output = cv2.VideoWriter(output_path, -1, fps, img_size, 1)
+        # opencv solution?
+        # if not fourcc:
+        #     fourcc = fourcc = cv2.cv.CV_FOURCC(*'MPEG')
+        # output = cv2.VideoWriter(output_path, -1, fps, img_size, 1)
+
+        # ffmpeg solution
+        p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec',
+                   'mjpeg', '-r', str(fps), '-i', '-', '-vcodec',
+                   'mpeg4', '-qscale', '5', '-r', str(fps), output_path],
+                   stdin=PIPE)
 
         for i in range(frames):
             result, frame = video.read()
@@ -222,18 +233,20 @@ class AsciiMovie(object):
             if result:
                 ascii_img = AsciiImage(frame, scalefactor=self.scalefactor,
                                        invert=self.invert)
-                pil_img = ascii_to_pil(ascii_img.data)
-                numpy_img = np.array(pil_img)
-                output.write(numpy_img)
-                status.update(i)
+                pil_img = ascii_to_pil(ascii_img.data, font_size=font_size)
+                pil_img.save(p.stdin, 'JPEG')
+                #numpy_img = np.array(pil_img)
+                #output.write(numpy_img)  # opencv
+                #status.update(i)
             else:
                 break
 
-        status.complete()
-
         video.release()
-        output.release()
+        #output.release()  # opencv
+        p.stdin.close()
+        p.wait()
 
+        #status.complete()
 
 
 class AsciiCamera(object):

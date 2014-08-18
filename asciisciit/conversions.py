@@ -12,10 +12,12 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont
 import numpy as np
 from bisect import bisect
 import random
+import os
 import cv2
 import matplotlib.pyplot as plt
 from misc import *
 
+RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
 
 GREYSCALE_RANDOM = [
     " ",
@@ -132,8 +134,11 @@ def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
 
     return text
 
-def ascii_to_pil(text, bg_color=(20,20,20), fg_color=(255,255,255)):
-    font = ImageFont.load_default()
+def ascii_to_pil(text, font_size=10, bg_color=(20,20,20), fg_color=(255,255,255)):
+    #font = ImageFont.load_default()
+    font_path = os.path.join(RESOURCE_DIR,"Cousine-Regular.ttf")
+
+    font = ImageFont.truetype(font_path, font_size)
     font_width, font_height = font.getsize(" ")  # shape of 1 char
 
     img_height, img_width = get_ascii_image_size(text)
@@ -153,7 +158,7 @@ def ascii_to_pil(text, bg_color=(20,20,20), fg_color=(255,255,255)):
     return img
 
 
-def ascii_seq_to_gif(seq, output_path, fps=15.0):
+def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
     try:
         from images2gif import writeGif
     except ImportError as e:
@@ -170,7 +175,7 @@ def ascii_seq_to_gif(seq, output_path, fps=15.0):
         else:
             #AsciiImage instance
             text = ascii_img.data
-        images.append(ascii_to_pil(text))
+        images.append(ascii_to_pil(text, font_size=font_size))
         status.update(index)
 
     status.complete()

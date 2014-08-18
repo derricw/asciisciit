@@ -61,16 +61,16 @@ class StatusBar(object):
 
     def update(self, index):
         percent_complete = 1.0*index/self.length*100
-        sys.stdout.write("\r%s%d%%" % (self.text, percent_complete))
+        sys.stdout.write("\r%s%d%% " % (self.text, percent_complete))
         sys.stdout.flush()
 
     def complete(self):
-        sys.stdout.write("\r%s%d%%" % (self.text, 100))
+        sys.stdout.write("\r%s%d%% " % (self.text, 100))
         sys.stdout.flush()
         print("...FINISHED")
 
     def update_custom(self, index):
-        sys.stdout.write("\r%s%d" % (self.text, index))
+        sys.stdout.write("\r%s%d " % (self.text, index))
 
 
 if __name__ == '__main__':

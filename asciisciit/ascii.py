@@ -50,6 +50,7 @@ def main():
     parser.add_argument('-e', type=bool, help='Equalize Histogram',
                         default=True)
     parser.add_argument('-f', type=float, help='Target FPS', default=15.0)
+    parser.add_argument('-p', type=int, help='Font render point size', default=10)
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()
     args = vars(args)
@@ -98,7 +99,8 @@ def main():
                                   invert=args['i'])
                 if args['outfile']:
                     task.render(args['outfile'],
-                                fps=args['f'])
+                                fps=args['f'],
+                                font_size=args['p'])
                 else:
                     task.play(repeats=args['r'],
                               fps=args['f'])
@@ -109,7 +111,8 @@ def main():
                                   invert=args['i'],
                                   equalize=args['e'])
                 if args['outfile']:
-                    task.render(args['outfile'])
+                    task.render(args['outfile'],
+                                font_size=args['p'])
                 else:
                     print(task)
                     raw_input("")
