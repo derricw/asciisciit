@@ -47,8 +47,7 @@ def main():
     parser.add_argument('-i', type=bool, help='Invert Luminance',
                         default=False)
     parser.add_argument('-w', type=int, help='Webcam ID', default=-1)
-    parser.add_argument('-e', type=bool, help='Equalize Histogram',
-                        default=True)
+    parser.add_argument('--e', help='Equalize Histogram', action='store_true')
     parser.add_argument('-f', type=float, help='Target FPS', default=15.0)
     parser.add_argument('-p', type=int, help='Font render point size', default=10)
     parser.add_argument('--n', help='New terminal', action='store_true')
@@ -96,7 +95,8 @@ def main():
             if ext in MOVIES+GIFS:
                 task = AsciiMovie(args['infile'],
                                   scalefactor=args['s'],
-                                  invert=args['i'])
+                                  invert=args['i'],
+                                  equalize=args['e'])
                 if args['outfile']:
                     task.render(args['outfile'],
                                 fps=args['f'],
@@ -123,8 +123,10 @@ def main():
         elif args['w'] > -1:
             task = AsciiCamera(args['w'],
                                scalefactor=args['s'],
-                               invert=args['i'])
+                               invert=args['i'],
+                               equalize=args['e'])
             task.stream(fps=args['f'])
+            task.release()
 
 if __name__ == '__main__':
     main()

@@ -98,10 +98,16 @@ class AsciiMovie(object):
 
     """
 
-    def __init__(self, movie_path, scalefactor=0.2, invert=False):
+    def __init__(self,
+                 movie_path,
+                 scalefactor=0.2,
+                 invert=False,
+                 equalize=True):
+
         self.movie_path = movie_path
         self.scalefactor = scalefactor
         self.invert = invert
+        self.equalize = equalize
 
         if type(self.movie_path) == str:
             # movie is a file
@@ -122,7 +128,8 @@ class AsciiMovie(object):
         self.draw_times = []
 
     def _play_gif(self, fps=15, repeats=1):
-        seq = generateSequence(self.data, scalefactor=self.scalefactor)
+        seq = generateSequence(self.data, scalefactor=self.scalefactor,
+            equalize=self.equalize)
         if repeats < 0:
             while True:
                 playSequence(seq, fps)
@@ -143,8 +150,10 @@ class AsciiMovie(object):
                     print("End of movie.")
                     break
                 if result:
-                    ascii_img = AsciiImage(image, scalefactor=self.scalefactor,
-                                           invert=self.invert)
+                    ascii_img = AsciiImage(image,
+                                           scalefactor=self.scalefactor,
+                                           invert=self.invert,
+                                           equalize=self.equalize)
                     #set terminal size on the first image?
                     if frame == 0:
                         try:
@@ -175,7 +184,7 @@ class AsciiMovie(object):
 
             video.release()
 
-    def _render_to_gif(self, output_path, font_size=10):
+    def _render_to_gif(self, output_path, fps=15.0, font_size=10):
         """
         Render text to gif of text.
 
@@ -186,9 +195,12 @@ class AsciiMovie(object):
 
         """
         seq = generateSequence(self.data, scalefactor=self.scalefactor)
-        ascii_seq_to_gif(seq, output_path, font_size=font_size)
+        ascii_seq_to_gif(seq, output_path, fps=fps, font_size=font_size)
 
-    def _render_to_movie(self, output_path, fourcc=None, fps=24,
+    def _render_to_movie(self,
+                         output_path,
+                         fourcc=None,
+                         fps=24,
                          font_size=10):
         """
 
@@ -205,8 +217,9 @@ class AsciiMovie(object):
                 break
             if frames == 0:
                 #get resulting image size once
-                ascii_img = AsciiImage(frame, scalefactor=self.scalefactor,
-                       invert=self.invert)
+                ascii_img = AsciiImage(frame,
+                                       scalefactor=self.scalefactor,
+                                       invert=self.invert)
                 pil_img = ascii_to_pil(ascii_img.data)
                 img_size = pil_img.size
             frames += 1
@@ -235,9 +248,12 @@ class AsciiMovie(object):
             if type(frame) != np.ndarray:
                 break
             if result:
-                ascii_img = AsciiImage(frame, scalefactor=self.scalefactor,
-                                       invert=self.invert)
-                pil_img = ascii_to_pil(ascii_img.data, font_size=font_size)
+                ascii_img = AsciiImage(frame,
+                                       scalefactor=self.scalefactor,
+                                       invert=self.invert,
+                                       equalize=self.equalize)
+                pil_img = ascii_to_pil(ascii_img.data,
+                                       font_size=font_size)
                 pil_img.save(p.stdin, 'JPEG')
                 #numpy_img = np.array(pil_img)
                 #output.write(numpy_img)  # opencv
@@ -255,10 +271,15 @@ class AsciiMovie(object):
 
 class AsciiCamera(object):
 
-    def __init__(self, camera_id=0, scalefactor=0.2, invert=False):
+    def __init__(self,
+                 camera_id=0,
+                 scalefactor=0.2,
+                 invert=False,
+                 equalize=True):
         self.scalefactor = scalefactor
         self.invert = invert
         self.camera_id = camera_id
+        self.equalize = self.equalize
 
         #webcam?
         self.video = cv2.VideoCapture(self.camera_id)
@@ -308,13 +329,17 @@ class AsciiCamera(object):
         print("Max frame interval:", np.max(self.frame_intervals))
         print("Min frame interval:", np.min(self.frame_intervals))
 
+        self.release()
+
+    def release(self):
         self.video.release()
 
 
-def generateSequence(imageseq, scalefactor=0.1):
+def generateSequence(imageseq, scalefactor=0.1, equalize=True):
     seq = []
     for im in imageseq:
-        seq.append(AsciiImage(im, scalefactor))
+        seq.append(AsciiImage(im, scalefactor,
+            equalize=equalize))
     return seq
 
 

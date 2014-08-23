@@ -1,13 +1,24 @@
 asciisciit
 ===========
 
-ASCII Art, Video, and Plotting Toolbox
+# ASCII Art, Video, and Plotting Toolbox
+
+Ever wanted to convert gifs to text and then back into gifs again?
+
+Ever wanted to convert movies to text and watch them in your terminal?
+
+Ever wanted to stream your webcam into your terminal as text?
+
+Me neither.
+
+But now I can!
+
+![costner](http://i.imgur.com/lncbpBm.gif)
+![wrunner](http://i.imgur.com/LrGqxRg.png)
 
 ## Installation
 
 ### Requirements
-
-You will need these three packages:
 
 [Pillow](https://pillow.readthedocs.org/en/latest/)
 
@@ -15,11 +26,7 @@ Get the latest version of Pillow.  <=2.0.0 has issues writing gifs.
 
 [Numpy](http://www.numpy.org/)
 
-Numpy is used for some array manipulation.
-
 [OpenCV](http://opencv.org/)
-
-OpenCV is used for video capture and reading.
 
 ### Setup
 
@@ -53,4 +60,8 @@ Link ascii.py like so:
 
     $>asciit -h
 
-    $>asciit 
+#### Examples to run!
+
+
+
+### Using the module
