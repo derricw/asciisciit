@@ -37,8 +37,8 @@ class AsciiImage(object):
     invert : bool
         Whether to invert the intensity values
     equalize : True
-        Equalize the image histogram to increase contrast.  I suggest always
-        setting this to true.
+        Equalize the image histogram to increase contrast.  This should be set
+        to True for most images.
 
 
     Examples
@@ -94,7 +94,8 @@ class AsciiMovie(object):
     Examples
     --------
 
-    >>> movie = AsciiMovie('')
+    >>> movie = AsciiMovie('awesome_movie_with_kung_fu_and_boobs.avi')
+    >>> movie.play(fps=24.0)
 
     """
 
@@ -121,13 +122,14 @@ class AsciiMovie(object):
             elif ext in  [".mp4", ".avi"]:
                 self.play = self._play_movie
                 self.render = self._render_to_movie
+                #self.shape = 
         else:
             raise("movie_path must be a string")
 
         self.frame_intervals = []
         self.draw_times = []
 
-    def _play_gif(self, fps=15, repeats=1):
+    def _play_gif(self, fps=15, repeats=-1):
         seq = generateSequence(self.data, scalefactor=self.scalefactor,
             equalize=self.equalize)
         if repeats < 0:
@@ -200,7 +202,7 @@ class AsciiMovie(object):
     def _render_to_movie(self,
                          output_path,
                          fourcc=None,
-                         fps=24,
+                         fps=24.0,
                          font_size=10):
         """
 
@@ -279,7 +281,7 @@ class AsciiCamera(object):
         self.scalefactor = scalefactor
         self.invert = invert
         self.camera_id = camera_id
-        self.equalize = self.equalize
+        self.equalize = equalize
 
         #webcam?
         self.video = cv2.VideoCapture(self.camera_id)
@@ -299,8 +301,10 @@ class AsciiCamera(object):
                 print("End of movie.")
                 break
             if result:
-                ascii_img = AsciiImage(image, scalefactor=self.scalefactor,
-                                       invert=self.invert)
+                ascii_img = AsciiImage(image,
+                                       scalefactor=self.scalefactor,
+                                       invert=self.invert,
+                                       equalize=self.equalize)
                 #set terminal size on the first image?
                 if frame == 0:
                     try:

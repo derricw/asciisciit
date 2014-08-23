@@ -44,8 +44,7 @@ def main():
                         default=-1)
     parser.add_argument('-s', type=float, help='Scale factor',
                         default=0.2)
-    parser.add_argument('-i', type=bool, help='Invert Luminance',
-                        default=False)
+    parser.add_argument('--i', help='Invert Luminance', action="store_true")
     parser.add_argument('-w', type=int, help='Webcam ID', default=-1)
     parser.add_argument('--e', help='Equalize Histogram', action='store_true')
     parser.add_argument('-f', type=float, help='Target FPS', default=15.0)

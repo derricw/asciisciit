@@ -62,7 +62,7 @@ BINS = [15, 25, 45, 60, 75, 90, 100, 115, 135, 155, 170, 185, 205, 220, 235,
 ASPECTCORRECTIONFACTOR = 6.0/11.0  # because text pixels are rectangular
 
 
-def image_to_ascii(img, scalefactor=0.1, invert=False, equalize=True):
+def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     """
     Generates and ascii string from an image of some kind.
 
