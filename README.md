@@ -20,13 +20,12 @@ But now I can!
 
 ### Requirements
 
-[Pillow](https://pillow.readthedocs.org/en/latest/)
-
+1. [Pillow](https://pillow.readthedocs.org/en/latest/)
 Get the latest version of Pillow.  <=2.0.0 has issues writing gifs.
 
-[Numpy](http://www.numpy.org/)
+2. [Numpy](http://www.numpy.org/)
 
-[OpenCV](http://opencv.org/)
+3. [OpenCV](http://opencv.org/)
 
 ### Setup
 
@@ -38,30 +37,25 @@ Install with:
 
 ### CLI
 
-#### Windows
+The CLI should work as long as you install using setup.py.
 
-##### Manual
-
-Add ".py" to the PATHEXT environment variable.
-
-Add the package directory to PATH.
-
-##### Automatic
-
-#### Linux
-
-##### Manual
-
-Link ascii.py like so:
-
-    $>ln -s 'python /path/to/ascii.py' asciit
-
-##### Automatic
-
+If not, you will need to mess with environment variables and/or symbolic links.
 
 #### Examples to run!
 
+Convert a gif to ascii and render it back to gif in 8 point font:
 
+    $>asciit *********.gif ascii_render.gif -p 8
+
+Display webcam feed from camera 0 in a new terminal, with histogram equalization:
+
+    $>asciit -w 0 --n --e
+
+Play a video file in a new terminal, scale to 0.15 characters per pixel, display at 24 fps:
+
+    $>asciit *********.mp4 -s 0.15 --n -f 24.0
+
+Convert a video to ascii
 
 ### Using the module
 

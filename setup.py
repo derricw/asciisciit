@@ -28,6 +28,7 @@ setup(name="asciisciit",
       packages=find_packages(),
       zip_safe=True,
       requires=['cv2', 'cv', 'numpy', 'pil'],
-      entry_points = {'console_scripts': ['ascii = asciisciit.ascii',],},
+      package_data = {"":["res/*.ttf"]},
+      entry_points = {'console_scripts': ['asciit = asciisciit.asciit:main',],},
       )
 
