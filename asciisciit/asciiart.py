@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 
 ASCII Toolbox for Converting Images, Movies, Gifs, and Video Feed
@@ -7,6 +8,8 @@ Created on 14 Aug 2014
 @author: Derric Williams
 
 '''
+
+from __future__ import print_function
 
 import time
 import os
@@ -364,3 +367,4 @@ def playSequence(seq, fps=30, repeats=1):
 
 if __name__ == '__main__':
     pass
+ 

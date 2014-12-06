@@ -45,7 +45,7 @@ If not, you will need to mess with environment variables and/or symbolic links.
 
 Convert a gif to ascii and render it back to gif in 8 point font:
 
-    $>asciit *********.gif ascii_render.gif -p 8
+    $>asciit dealwithit.gif ascii_render.gif -p 8
 
 Display webcam feed from camera 0 in a new terminal, with histogram equalization:
 
@@ -53,7 +53,7 @@ Display webcam feed from camera 0 in a new terminal, with histogram equalization
 
 Play a video file in a new terminal, scale to 0.15 characters per pixel, display at 24 fps:
 
-    $>asciit *********.mp4 -s 0.15 --n -f 24.0
+    $>asciit totally_not_porn.mp4 -s 0.15 --n -f 24.0
 
 Convert a video to ascii
 
@@ -63,7 +63,7 @@ Convert a video to ascii
 
     >>> from asciisciit.asciiart import AsciiImage
     >>> img = AsciiImage("my_img.png")
-    >>> print img
+    >>> print(img)
     >>> img.render("output.png", fontsize=8, bg_color=(20,20,20), fg_color=(255,255,255))
 
 #### Gifs
