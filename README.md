@@ -14,7 +14,6 @@ Me neither.
 But now I can!
 
 ![costner](http://i.imgur.com/lncbpBm.gif)
-![wrunner](http://i.imgur.com/LrGqxRg.png =500x)
 
 ## Installation
 
@@ -26,6 +25,8 @@ Get the latest version of Pillow.  <=2.0.0 has issues writing gifs.
 2. [Numpy](http://www.numpy.org/)
 
 3. [OpenCV](http://opencv.org/)
+
+4. [Matplotlib](https://matplotlib.org/)
 
 ### Setup
 
@@ -53,7 +54,7 @@ Display webcam feed from camera 0 in a new terminal, with histogram equalization
 
 Play a video file in a new terminal, scale to 0.15 characters per pixel, display at 24 fps:
 
-    $>asciit totally_not_porn.mp4 -s 0.15 --n -f 24.0
+    $>asciit cats.mp4 -s 0.15 --n -f 24.0
 
 Convert a video to ascii
 
