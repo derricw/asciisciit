@@ -47,7 +47,7 @@ def main():
     parser.add_argument('--i', help='Invert Luminance', action="store_true")
     parser.add_argument('-w', type=int, help='Webcam ID', default=-1)
     parser.add_argument('--e', help='Equalize Histogram', action='store_true')
-    parser.add_argument('-f', type=float, help='Target FPS', default=15.0)
+    parser.add_argument('-f', type=float, help='Target FPS', default=None)
     parser.add_argument('-p', type=int, help='Font render point size', default=10)
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()

@@ -14,7 +14,6 @@ from bisect import bisect
 import random
 import os
 import cv2
-import matplotlib.pyplot as plt
 from misc import *
 
 RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
@@ -299,6 +298,10 @@ def gif_to_numpy(gif_path):
     Converts a GIF into a numpy movie.
     """
     gif = open_pil_img(gif_path)
+    if hasattr(gif, 'info'):
+        frame_duration = gif.info.get('duration', None)
+    else:
+        frame_duration = None
     length = get_length_of_gif(gif)
 
     size = gif.size
@@ -329,7 +332,7 @@ def gif_to_numpy(gif_path):
     for i, frame in enumerate(frames):
         img = np.asarray(frame)
         matrix[i] = img
-    return matrix
+    return matrix, frame_duration
 
 def figure_to_numpy(mpl_figure):
     """

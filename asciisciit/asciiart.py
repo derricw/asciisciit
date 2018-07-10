@@ -112,13 +112,15 @@ class AsciiMovie(object):
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
+        self.default_fps = 15.0
 
         if type(self.movie_path) == str:
             # movie is a file
             _,ext = os.path.splitext(self.movie_path)
 
             if ext == ".gif":
-                self.data = gif_to_numpy(self.movie_path)
+                self.data, frame_duration = gif_to_numpy(self.movie_path)
+                self.default_fps = 1000.0/frame_duration
                 self.shape = self.data.shape
                 self.play = self._play_gif
                 self.render = self._render_to_gif
@@ -132,7 +134,8 @@ class AsciiMovie(object):
         self.frame_intervals = []
         self.draw_times = []
 
-    def _play_gif(self, fps=15, repeats=-1):
+    def _play_gif(self, fps=None, repeats=-1):
+        fps = fps or self.default_fps
         seq = generateSequence(self.data, scalefactor=self.scalefactor,
             equalize=self.equalize)
         if repeats < 0:
@@ -142,7 +145,8 @@ class AsciiMovie(object):
             for i in range(repeats):
                 playSequence(seq, fps)
 
-    def _play_movie(self, fps=15, repeats=1):
+    def _play_movie(self, fps=None, repeats=1):
+        fps = fps or self.default_fps
         if repeats < 0:
             repeats = 1  # lets just play movies once by default
         for i in range(repeats):
@@ -189,7 +193,7 @@ class AsciiMovie(object):
 
             video.release()
 
-    def _render_to_gif(self, output_path, fps=15.0, font_size=10):
+    def _render_to_gif(self, output_path, fps=None, font_size=10):
         """
         Render text to gif of text.
 
@@ -199,17 +203,19 @@ class AsciiMovie(object):
             Where to write the gif.
 
         """
+        fps = fps or self.default_fps
         seq = generateSequence(self.data, scalefactor=self.scalefactor)
         ascii_seq_to_gif(seq, output_path, fps=fps, font_size=font_size)
 
     def _render_to_movie(self,
                          output_path,
                          fourcc=None,
-                         fps=24.0,
+                         fps=None,
                          font_size=10):
         """
 
         """
+        fps = fps or self.default_fps
         video = cv2.VideoCapture(self.movie_path)
         frames = 0
         
