@@ -4,7 +4,10 @@ import os, sys, glob, fnmatch
 setup(name="asciisciit",
       version=0.1,
       description="asciisciit is a Python toolbox for displaying and converting images, movies, and camera feeds into ascii.",
-      long_description="""asciisciit is a Python toolbox for displaying and converting images, movies, gifs, and webcam feeds into ASCII.  It uses OpenCV, Numpy, and PIL for image processing, and is tested on windows and linux.""",
+      long_description="""asciisciit is a Python toolbox for displaying and
+      converting images, movies, gifs, and webcam feeds into ASCII.  It uses
+      Numpy, and PIL for image processing, OpenCV for camera access, ffmpeg for
+      video writing, and is tested on windows and linux.""",
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
@@ -13,7 +16,7 @@ setup(name="asciisciit",
           'License :: OSI Approved :: MIT License',
           'Operating System :: Windows',
           'Operating System :: POSIX :: Linux'
-          'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
           'Topic :: Multimedia :: Graphics :: Capture :: Digital Camera',
           'Topic :: Multimedia :: Graphics :: Graphics Conversion',
           'Topic :: Multimedia :: Video :: Capture',
