@@ -17,30 +17,11 @@ But now I can!
 
 ## Installation
 
-### Requirements
+Install with pip to make sure you get the dependencies.
 
-1. [Pillow](https://pillow.readthedocs.org/en/latest/)
-Get the latest version of Pillow.  <=2.0.0 has issues writing gifs.
-
-2. [Numpy](http://www.numpy.org/)
-
-3. [OpenCV](http://opencv.org/)
-
-4. [Matplotlib](https://matplotlib.org/)
-
-### Setup
-
-Install with:
-
-    python setup.py install
+    $ pip install asciisciit
 
 ## Use
-
-### CLI
-
-The CLI should work as long as you install using setup.py.
-
-If not, you will need to mess with environment variables and/or symbolic links.
 
 #### Examples to run!
 
@@ -81,8 +62,8 @@ Convert a video to ascii
     >>> movie.play(fps=24.0)
     >>> movie.render("output.avi", fps=24.0, fontsize=8)
 
-## Known Issues
+## TODO:
 
-1. Sometimes gifs look really wonkey.  Especially ones with superimposed text.  I blame PIL.
+1. Color
+1. gifv and other file types
 
-![traincat](http://i.imgur.com/TIFHP.gif)
