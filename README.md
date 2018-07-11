@@ -43,21 +43,21 @@ Convert a video to ascii
 
 #### Images
 
-    >>> from asciisciit.asciiart import AsciiImage
+    >>> from asciisciit import AsciiImage
     >>> img = AsciiImage("my_img.png")
     >>> print(img)
     >>> img.render("output.png", fontsize=8, bg_color=(20,20,20), fg_color=(255,255,255))
 
 #### Gifs
 
-    >>> from asciisciit.asciiart import AsciiMovie
+    >>> from asciisciit import AsciiMovie
     >>> gif = AsciiMovie("my_gif.gif", scalefactor=0.2)
     >>> gif.play(fps=15.0)  #play at 15 fps
     >>> gif.render("ouput.gif", fps=15.0, fontsize=8)
 
 #### Movies
 
-    >>> from asciisciit.asciiart import AsciiMovie
+    >>> from asciisciit import AsciiMovie
     >>> movie = AsciiMovie("my_movie.avi", scalefactor=0.2)
     >>> movie.play(fps=24.0)
     >>> movie.render("output.avi", fps=24.0, fontsize=8)

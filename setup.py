@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import os, sys, glob, fnmatch
 
 setup(name="asciisciit",
-      version=0.1,
+      version="0.1.1",
       description="asciisciit is a Python toolbox for displaying and converting images, movies, and camera feeds into ascii.",
       long_description="""asciisciit is a Python toolbox for displaying and
       converting images, movies, gifs, and webcam feeds into ASCII.  It uses
@@ -14,14 +14,13 @@ setup(name="asciisciit",
           'Intended Audience :: Religion',
           'Intended Audience :: End Users/Desktop',
           'License :: OSI Approved :: MIT License',
-          'Operating System :: Windows',
-          'Operating System :: POSIX :: Linux'
+          'Operating System :: Microsoft :: Windows',
+          'Operating System :: POSIX :: Linux',
           'Programming Language :: Python :: 2',
           'Topic :: Multimedia :: Graphics :: Capture :: Digital Camera',
           'Topic :: Multimedia :: Graphics :: Graphics Conversion',
           'Topic :: Multimedia :: Video :: Capture',
           'Topic :: Multimedia :: Video :: Display',
-          'Topic :: Graphics :: Viewers',
           'Topic :: Software Development :: Libraries :: Python Modules'],
       keywords='ascii, opencv, PIL, terminal',
       author='Derric Williams',
