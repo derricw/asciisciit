@@ -18,42 +18,8 @@ from misc import *
 
 RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
 
-GREYSCALE_RANDOM = [
-    " ",
-    ". ",
-    ",-",
-    "_ivc=!/|\\~",
-    "gjezt*+",
-    "2](YL)[T7Vf",
-    "mdK4",
-    "mdK4ZGbN",
-    "DXY5P"
-    "#%$"
-    "W8KMA",
 
-    ]
-
-GREYSCALE_UNIFORM = [
-    " ",
-    ".",
-    "'",
-    "-",
-    ":",
-    ";",
-    "!",
-    "~",
-    "*",
-    "+",
-    "e",
-    "m",
-    "6",
-    "8",
-    "g",
-    "#",
-    "W",
-    "M",
-    "@",
-]
+GREYSCALE_UNIFORM = " .'-:;!~*+em68g#WM@"
 
 BINS = [15, 25, 45, 60, 75, 90, 100, 115, 135, 155, 170, 185, 205, 220, 235,
         245, 250]
@@ -147,7 +113,7 @@ def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     text = "\n"
 
     ##TODO: custom LUT
-    lut = GREYSCALE_UNIFORM
+    lut = list(GREYSCALE_UNIFORM)
 
     #SLOW ##TODO: USE Image.point(lut) instead
     for y in range(0, img.size[1]):
