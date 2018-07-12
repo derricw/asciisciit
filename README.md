@@ -44,7 +44,7 @@ Convert a video to ascii
 #### Images
 
     >>> from asciisciit import AsciiImage
-    >>> img = AsciiImage("my_img.png")
+    >>> img = AsciiImage("my_img.png", scalefactor=0.2)
     >>> print(img)
     >>> img.render("output.png", fontsize=8, bg_color=(20,20,20), fg_color=(255,255,255))
 
@@ -65,5 +65,6 @@ Convert a video to ascii
 ## TODO:
 
 1. Color
-1. gifv and other file types
+1. webm and other file types
+1. python3
 
