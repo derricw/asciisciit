@@ -22,6 +22,10 @@ def set_terminal_size(size):
     #os.system("stty cols %s" % cols)
     return
 
+def get_terminal_size():
+    result = commands.getoutput("stty size")
+    return map(int, result.split(" "))
+    
 
 def new_term(command, size=None):
     """
