@@ -19,11 +19,7 @@ import cv2
 import numpy as np
 
 from conversions import *
-
-if "linux" in platform.system().lower():
-    from linux_backend import *
-else:
-    from windows_backend import *
+import console
 
 
 class AsciiImage(object):
@@ -52,17 +48,23 @@ class AsciiImage(object):
 
     """
     def __init__(self, image, scalefactor=0.1, invert=False, equalize=True):
+        self.image = image
+        self.scalefactor = scalefactor
+        self.invert = invert
+        self.equalize = equalize
 
-        self.data = image_to_ascii(image, scalefactor, invert, equalize)
+    @property
+    def data(self):
+        return image_to_ascii(self.image,
+                              self.scalefactor,
+                              self.invert,
+                              self.equalize)
+    @property
+    def size(self):
+        return get_ascii_image_size(self.data)
 
     def __repr__(self):
         return self.data
-
-    def __getattribute__(self, name):
-        if name == "size":
-            return get_ascii_image_size(self.data)
-        else:
-            return object.__getattribute__(self, name)
 
     def to_file(self, path):
         with open(path, "w+") as f:
@@ -72,10 +74,10 @@ class AsciiImage(object):
         img = ascii_to_pil(self.data, font_size, bg_color, fg_color)
         img.save(path)
 
-    def show(self, resize_term=False):
+    def show(self, resize_term=False, rescale=False):
         if resize_term:
             try:
-                set_terminal_size(self.size)
+                console.set_terminal_size(self.size)
             except:
                 pass
         print(self.data)
@@ -166,10 +168,10 @@ class AsciiMovie(object):
                     #set terminal size on the first image?
                     if frame == 0:
                         try:
-                            set_terminal_size(ascii_img.size)
+                            console.set_terminal_size(ascii_img.size)
                         except:
                             pass
-                    clear_term()
+                    console.clear_term()
                     print(ascii_img)
                     frame += 1
                 else:
@@ -320,7 +322,7 @@ class AsciiCamera(object):
                         set_terminal_size(ascii_img.size)
                     except:
                         pass
-                clear_term()
+                console.clear_term()
                 print(ascii_img)
                 frame += 1
             else:
@@ -358,10 +360,10 @@ def generateSequence(imageseq, scalefactor=0.1, equalize=True):
 
 def playSequence(seq, fps=30, repeats=1):
     shape = seq[0].size
-    set_terminal_size(shape)
+    console.set_terminal_size(shape)
     t = time.clock()
     for im in seq:
-        clear_term()
+        console.clear_term()
         print(im)
         interval = time.clock()-t
         t = time.clock()

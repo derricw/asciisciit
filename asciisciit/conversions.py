@@ -14,49 +14,10 @@ from bisect import bisect
 import random
 import os
 import cv2
-from misc import *
+from asciisciit.misc import *
+from asciisciit.lut import LUM
 
 RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
-
-GREYSCALE_RANDOM = [
-    " ",
-    ". ",
-    ",-",
-    "_ivc=!/|\\~",
-    "gjezt*+",
-    "2](YL)[T7Vf",
-    "mdK4",
-    "mdK4ZGbN",
-    "DXY5P"
-    "#%$"
-    "W8KMA",
-
-    ]
-
-GREYSCALE_UNIFORM = [
-    " ",
-    ".",
-    "'",
-    "-",
-    ":",
-    ";",
-    "!",
-    "~",
-    "*",
-    "+",
-    "e",
-    "m",
-    "6",
-    "8",
-    "g",
-    "#",
-    "W",
-    "M",
-    "@",
-]
-
-BINS = [15, 25, 45, 60, 75, 90, 100, 115, 135, 155, 170, 185, 205, 220, 235,
-        245, 250]
 
 ASPECTCORRECTIONFACTOR = 6.0/11.0  # because text pixels are rectangular
 
@@ -101,7 +62,12 @@ def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     return text
 
 
-def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
+def pil_to_ascii(img,
+                 scalefactor=0.2,
+                 invert=False,
+                 equalize=True,
+                 lut='simple',
+                 ):
     """
     Generates an ascii string from a PIL image.
 
@@ -146,15 +112,15 @@ def pil_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
 
     text = "\n"
 
-    ##TODO: custom LUT
-    lut = GREYSCALE_UNIFORM
+    chars, lums = LUM[lut.upper()]
+    chars = list(chars)
 
     #SLOW ##TODO: USE Image.point(lut) instead
     for y in range(0, img.size[1]):
         for x in range(0, img.size[0]):
             lum = img.getpixel((x, y))
-            row = bisect(BINS, lum)
-            character = lut[row]
+            row = bisect(lums, lum)
+            character = chars[row]
             text += character
         text += "\n"
 

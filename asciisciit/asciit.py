@@ -23,11 +23,7 @@ import sys
 import os
 import platform
 
-if "linux" in platform.system().lower():
-    from linux_backend import *
-else:
-    from windows_backend import *
-
+import console
 from asciiart import *
 from misc import *
 
@@ -79,10 +75,10 @@ def main():
                 size = None
         else:
             size = None
-        if size:
+        if size and sf:
             size = (int(size[0]*sf), int(size[1]*sf*ASPECTCORRECTIONFACTOR))
 
-        new_term(call_str, size)  # call in new terminal without --n argument
+        console.new_term(call_str, size)  # call in new terminal without --n argument
 
     #same terminal
     else:
