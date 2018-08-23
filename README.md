@@ -19,6 +19,14 @@ But now I can!
 
 Install with pip to make sure you get the dependencies.
 
+    $ git clone https://github.com/derricw/asciisciit.git
+    
+    $ cd asciisciit
+    
+    $ pip install .
+    
+You can also install from pypi but the version there is older and doesn't support py3.
+
     $ pip install asciisciit
 
 ## Use
