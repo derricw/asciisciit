@@ -37,8 +37,6 @@ Play a video file in a new terminal, scale to 0.15 characters per pixel, display
 
     $>asciit cats.mp4 -s 0.15 --n -f 24.0
 
-Convert a video to ascii
-
 ### Using the module
 
 #### Images

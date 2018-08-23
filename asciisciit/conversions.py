@@ -166,7 +166,11 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
 
     img_height, img_width = get_ascii_image_size(text)
 
-    out_img = np.zeros((font_height*img_height, font_width*img_width, 3),
+    y_padding = 1
+
+    out_img = np.zeros(((font_height+y_padding)*img_height, 
+                         font_width*img_width,
+                         3),
                        dtype=np.uint8)
     out_img[:, :, 0] += bg_color[0]
     out_img[:, :, 1] += bg_color[1]
@@ -176,7 +180,7 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     draw = ImageDraw.Draw(img)
 
     for index, line in enumerate(text.split("\n")):
-        y = (font_height)*index
+        y = (font_height+y_padding)*index
         draw.text((0, y), line, fg_color, font=font)
     return img
 
