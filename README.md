@@ -5,8 +5,6 @@ asciisciit
 
 Ever wanted to convert gifs to text and then back into gifs again?
 
-Ever wanted to convert movies to text and watch them in your terminal?
-
 Ever wanted to stream your webcam into your terminal as text?
 
 Me neither.
@@ -16,6 +14,8 @@ But now I can!
 ![costner](http://i.imgur.com/lncbpBm.gif)
 
 ## Installation
+
+*Should* work with py2 or py3.
 
 Install with pip to make sure you get the dependencies.
 
@@ -65,6 +65,5 @@ Convert a video to ascii
 ## TODO:
 
 1. Color
-1. webm and other file types
-1. python3
+1. more/custom look up tables
 

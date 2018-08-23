@@ -24,7 +24,7 @@ RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
 ASPECTCORRECTIONFACTOR = 6.0/11.0  # because text pixels are rectangular
 
 
-def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
+def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True, lut='simple'):
     """
     Generates and ascii string from an image of some kind.
 
@@ -52,15 +52,12 @@ def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):
     """
     if type(img) == str:
         img = open_pil_img(img)
-        text = pil_to_ascii(img, scalefactor, invert, equalize)
     elif type(img) == np.ndarray:
-        #text = numpy_to_ascii(img, scalefactor, invert, equalize)  #WHY IS THIS SLOWER?
-        text = pil_to_ascii(numpy_to_pil(img), scalefactor, invert, equalize)
-    else:
-        try:
-            pil_to_ascii(img, scalefactor, invert, equalize)
-        except:
-            raise TypeError("That image type doesn't work.  Try PIL, Numpy, or file path...")
+        img = numpy_to_pil(img)
+    try:
+        text = pil_to_ascii(img, scalefactor, invert, equalize, lut)
+    except:
+        raise TypeError("That image type doesn't work.  Try PIL, Numpy, or file path...")
     return text
 
 
@@ -185,6 +182,17 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
 
 
 def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
+    """ Creates a gif from a sequence of ascii images.
+
+        Parameters
+        ----------
+        output_path : str
+            Path for gif output.
+        fps : float
+            FPS for gif playback.
+        font_size : int
+            Font size for ascii.
+    """
     images = []
 
     status = StatusBar(len(seq), text="Generating frames: ",)

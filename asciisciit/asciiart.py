@@ -48,18 +48,20 @@ class AsciiImage(object):
     >>> print(ascii)
 
     """
-    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True):
+    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True, lut='simple'):
         self.image = image
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
+        self.lut = lut
 
     @property
     def data(self):
         return image_to_ascii(self.image,
                               self.scalefactor,
                               self.invert,
-                              self.equalize)
+                              self.equalize,
+                              self.lut)
     @property
     def size(self):
         return get_ascii_image_size(self.data)
@@ -100,7 +102,7 @@ class AsciiMovie(object):
     Examples
     --------
 
-    >>> movie = AsciiMovie('awesome_movie_with_kung_fu_and_boobs.avi')
+    >>> movie = AsciiMovie('awesome_movie.avi')
     >>> movie.play(fps=24.0)
 
     """
@@ -109,12 +111,14 @@ class AsciiMovie(object):
                  movie_path,
                  scalefactor=0.2,
                  invert=False,
-                 equalize=True):
+                 equalize=True,
+                 lut='simple'):
 
         self.movie_path = movie_path
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
+        self.lut = lut
         self.default_fps = 15.0
 
         if type(self.movie_path) == str:
@@ -140,7 +144,7 @@ class AsciiMovie(object):
     def _play_gif(self, fps=None, repeats=-1):
         fps = fps or self.default_fps
         seq = generateSequence(self.data, scalefactor=self.scalefactor,
-            equalize=self.equalize)
+            equalize=self.equalize, lut=self.lut)
         if repeats < 0:
             while True:
                 playSequence(seq, fps)
@@ -165,7 +169,8 @@ class AsciiMovie(object):
                     ascii_img = AsciiImage(image,
                                            scalefactor=self.scalefactor,
                                            invert=self.invert,
-                                           equalize=self.equalize)
+                                           equalize=self.equalize,
+                                           lut=self.lut)
                     #set terminal size on the first image?
                     if frame == 0:
                         try:
@@ -203,7 +208,7 @@ class AsciiMovie(object):
         Parameters
         ----------
         output_path : str
-            Where to write the gif.
+            Output file path.
 
         """
         fps = fps or self.default_fps
@@ -351,11 +356,11 @@ class AsciiCamera(object):
         self.video.release()
 
 
-def generateSequence(imageseq, scalefactor=0.1, equalize=True):
+def generateSequence(imageseq, scalefactor=0.1, equalize=True, lut='simple'):
     seq = []
     for im in imageseq:
         seq.append(AsciiImage(im, scalefactor,
-            equalize=equalize))
+            equalize=equalize, lut=lut))
     return seq
 
 
