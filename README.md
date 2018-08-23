@@ -58,7 +58,7 @@ Play a video file in a new terminal, scale to 0.15 characters per pixel, display
     >>> from asciisciit import AsciiMovie
     >>> movie = AsciiMovie("my_movie.avi", scalefactor=0.2)
     >>> movie.play(fps=24.0)
-    >>> movie.render("output.avi", fps=24.0, fontsize=8)
+    >>> movie.render("output.avi", fps=24.0, fontsize=8) # requires ffmpeg
 
 ## TODO:
 
