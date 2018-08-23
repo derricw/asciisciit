@@ -23,9 +23,9 @@ import sys
 import os
 import platform
 
-import console
-from asciiart import *
-from misc import *
+import asciisciit.console as console
+from asciisciit.asciiart import *
+from asciisciit.misc import *
 
 MOVIES = [".mp4", '.avi', '.mpg', '.mpeg']
 IMAGES = ['.png', '.jpeg', '.jpg', '.tif', '.bmp']
@@ -99,7 +99,7 @@ def main():
                 else:
                     task.play(repeats=args['r'],
                               fps=args['f'])
-                    raw_input("")
+                    input("")
             elif ext in IMAGES:
                 task = AsciiImage(args['infile'],
                                   scalefactor=args['s'],
@@ -110,7 +110,7 @@ def main():
                                 font_size=args['p'])
                 else:
                     task.show()
-                    raw_input("")
+                    input("")
             else:
                 print("Unknown file format.Try:", MOVIES+IMAGES+GIFS)
 

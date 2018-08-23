@@ -7,13 +7,14 @@ conversions.py
 Bunch of random conversion functions.
 
 """
-
-from PIL import Image, ImageOps, ImageDraw, ImageFont
-import numpy as np
 from bisect import bisect
 import random
 import os
+
+from PIL import Image, ImageOps, ImageDraw, ImageFont
+import numpy as np
 import cv2
+
 from asciisciit.misc import *
 from asciisciit.lut import LUM
 

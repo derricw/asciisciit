@@ -10,7 +10,11 @@ Random crap that doesn't belong anywhere else.
 
 import sys
 import io
-import urllib2 as urllib
+if sys.version_info < (3, 0):
+    from urllib2 import urlopen
+else:
+    from urllib.request import urlopen
+
 import cv2
 from PIL import Image
 
@@ -33,7 +37,7 @@ def open_pil_img(path, *args, **kwargs):
         img = Image.open(path, *args, **kwargs)
     except IOError:
         #perhaps it is a web address?
-        fd = urllib.urlopen(path)
+        fd = urlopen(path)
         image_file = io.BytesIO(fd.read())
         img = Image.open(image_file, *args, **kwargs)
     return img

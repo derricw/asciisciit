@@ -15,11 +15,12 @@ import time
 import os
 import platform
 from subprocess import Popen, PIPE
+
 import cv2
 import numpy as np
 
-from conversions import *
-import console
+from asciisciit.conversions import *
+import asciisciit.console as console
 
 
 class AsciiImage(object):
