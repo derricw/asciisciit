@@ -14,6 +14,7 @@ import os
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 import numpy as np
 import cv2
+import imageio
 
 from asciisciit.misc import *
 from asciisciit.lut import LUM
@@ -184,11 +185,6 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
 
 
 def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
-    try:
-        from images2gif import writeGif
-    except ImportError as e:
-        raise RuntimeError("Writing gifs requires images2gif library.\nTry 'pip install images2gif' %s" % e)
-
     images = []
 
     status = StatusBar(len(seq), text="Generating frames: ",)
@@ -207,7 +203,8 @@ def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
 
     duration = 1.0/fps
 
-    writeGif(output_path, images, duration)
+    images_np = [np.array(img) for img in images]
+    imageio.mimsave(output_path, images_np, duration=duration)
 
 
 def numpy_to_ascii(img, scalefactor=0.2, invert=False, equalize=True):

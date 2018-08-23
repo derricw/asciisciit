@@ -29,7 +29,7 @@ setup(name="asciisciit",
       license='MIT',
       packages=find_packages(),
       zip_safe=True,
-      install_requires=['opencv-python', 'numpy', 'pillow'],
+      install_requires=['opencv-python', 'numpy', 'pillow', 'imageio'],
       package_data = {"":["res/*.ttf"]},
       entry_points = {'console_scripts': ['asciit = asciisciit.asciit:main',],},
       )
