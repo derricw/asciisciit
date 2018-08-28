@@ -35,15 +35,21 @@ You can also install from pypi.
 
 Convert a gif to ascii and render it back to gif in 8 point font:
 
-    $>asciit dealwithit.gif ascii_render.gif -p 8
+    $ asciit dealwithit.gif ascii_render.gif -p 8
 
 Display webcam feed from camera 0 in a new terminal, with histogram equalization:
 
-    $>asciit -w 0 --n --e
+    $ asciit -w 0 --n --e
 
 Play a video file in a new terminal, scale to 0.15 characters per pixel, display at 24 fps:
 
-    $>asciit cats.mp4 -s 0.15 --n -f 24.0
+    $ asciit cats.mp4 -s 0.15 --n -f 24.0
+
+You can even use URLs.
+
+    $ asciit https://media.giphy.com/media/bn0zlGb4LOyo8/giphy.gif cage.gif --e -s 0.6 -f 8
+
+![cage](https://i.imgur.com/51ccTSo.gifv)
 
 ### Using the module
 
