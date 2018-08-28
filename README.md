@@ -25,7 +25,7 @@ Install with pip to make sure you get the dependencies.
     
     $ pip install .
     
-You can also install from pypi but the version there is older and doesn't support py3.
+You can also install from pypi.
 
     $ pip install asciisciit
 
