@@ -49,7 +49,7 @@ You can even use URLs.
 
     $ asciit https://media.giphy.com/media/bn0zlGb4LOyo8/giphy.gif cage.gif --e -s 0.6 -f 8
 
-![cage](https://i.imgur.com/51ccTSo.gifv)
+![cage](https://i.imgur.com/51ccTSo.gif)
 
 ### Using the module
 
