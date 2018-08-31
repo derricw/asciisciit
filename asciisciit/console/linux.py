@@ -7,7 +7,7 @@ Linux support functions.
 """
 
 import os
-import commands
+import subprocess
 
 def clear_term():
     print(chr(27) + "[2J")
@@ -23,7 +23,7 @@ def set_terminal_size(size):
     return
 
 def get_terminal_size():
-    result = commands.getoutput("stty size")
+    result = subprocess.check_output(["stty", "size"])
     return map(int, result.split(" "))
     
 
@@ -34,13 +34,13 @@ def new_term(command, size=None):
     if size:
         width, height = size
         # do they have gnome terminal?
-        if commands.getoutput("which gnome-terminal"):
+        if subprocess.check_output(["which", "gnome-terminal"]):
             os.system("gnome-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
                       (width+1, height+3, command))
-        elif commands.getoutput("which xfce4-terminal"):
+        elif subprocess.check_output(["which", "xfce4-terminal"]):
             os.system("xfce4-terminal --geometry %sx%s -e 'bash -c \"python %s\"'" %
                       (width+1, height+3, command))
-        elif commands.getoutput("which konsole"):
+        elif subprocess.check_output(["which", "konsole"]):
             os.system("konsole --fullscreen -e 'bash -c \"python %s\"'" %
                       (command))
     else:
