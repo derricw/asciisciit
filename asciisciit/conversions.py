@@ -4,7 +4,7 @@ conversions.py
 
 @author: derricw
 
-Bunch of random conversion functions.
+Conversion functions.
 
 """
 from bisect import bisect

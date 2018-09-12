@@ -15,7 +15,7 @@ But now I can!
 
 ## Installation
 
-*Should* work with py2 or py3.
+*Should* work with py2 or py3, on both Linux and Windows.
 
 Install with pip to make sure you get the dependencies.
 
