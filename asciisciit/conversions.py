@@ -90,7 +90,7 @@ def pil_to_ascii(img,
     lookup_func : function
         Method to use to perform lookup. The function should take an image and
         a lut string and return the converted ascii image. Defaults to
-        `apply_lut_pil`.
+        `apply_lut_numpy`.
 
     Returns
     -------
@@ -111,7 +111,7 @@ def pil_to_ascii(img,
 
     """
     if lookup_func is None:
-        lookup_func = apply_lut_pil
+        lookup_func = apply_lut_numpy
     img = img.resize((int(img.size[0]*scalefactor), 
         int(img.size[1]*scalefactor*ASPECTCORRECTIONFACTOR)),
         Image.BILINEAR)
