@@ -224,7 +224,7 @@ def numpy_to_ascii(img,
                    equalize=True,
                    lut="simple"):
     """
-    Generates an ascii string from a PIL image.
+    Generates an ascii string from a numpy image.
 
     Parameters
     ----------
