@@ -79,11 +79,18 @@ def pil_to_ascii(img,
     img : PIL.Image
         PIL image to transform.
     scalefactor : float
-        ASCII characters per pixel
+        ASCII characters per pixel.
     invert : bool
         Invert luminance?
     equalize : bool
-        equalize histogram (for best results do this)
+        equalize histogram (for best results do this).
+    lut : str
+        Name of the lookup table to use. Currently supports 'simple' and
+        'binary'.
+    lookup_func : function
+        Method to use to perform lookup. The function should take an image and
+        a lut string and return the converted ascii image. Defaults to
+        `apply_lut_pil`.
 
     Returns
     -------
@@ -216,6 +223,27 @@ def numpy_to_ascii(img,
                    invert=False,
                    equalize=True,
                    lut="simple"):
+    """
+    Generates an ascii string from a PIL image.
+
+    Parameters
+    ----------
+    img : ndarray
+        PIL image to transform.
+    scalefactor : float
+        ASCII characters per pixel.
+    invert : bool
+        Invert luminance?
+    equalize : bool
+        equalize histogram (for best results do this).
+    lut : str
+        Name of the lookup table to use. Currently supports 'simple' and
+        'binary'.
+
+    Returns
+    -------
+    str
+    """
     h, w = img.shape
 
     img=cv2.resize(
@@ -310,6 +338,21 @@ def figure_to_ascii(mpl_figure):
 
 
 def apply_lut_pil(img, lut="simple"):
+    """
+    Apply an ascii lookup table to an image by looping over pixels.
+
+    Parameters
+    ----------
+    img : ndarray, PIL.Image
+        Greyscale image to directly apply LUT to.
+    lut : str
+        Name of the lookup table to use. Currently supports 'simple' and
+        'binary'.
+
+    Returns
+    -------
+    str
+    """
     if isinstance(img, np.ndarray):
         img = numpy_to_pil(img)
 
@@ -331,6 +374,21 @@ def apply_lut_pil(img, lut="simple"):
 
 
 def apply_lut_numpy(img, lut="simple"):
+    """
+    Apply an ascii lookup table to an image using numpy chararrays.
+
+    Parameters
+    ----------
+    img : ndarray, PIL.Image
+        Greyscale image to directly apply LUT to.
+    lut : str
+        Name of the lookup table to use. Currently supports 'simple' and
+        'binary'.
+
+    Returns
+    -------
+    str
+    """
     if isinstance(img, Image.Image):
         img = np.array(img, dtype=np.uint8)
 
