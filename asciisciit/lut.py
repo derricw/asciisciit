@@ -27,7 +27,7 @@ class LUT(object):
             self._chars[i] = char
         self._bins = np.array(bins, dtype=np.uint8)
 
-    def native_data(self):
+    def legacy_lookup(self):
         """Return legacy LUT form (chars, bins)."""
         return self._chars.tolist(), self._bins.tolist()
 
@@ -41,11 +41,11 @@ class LUT(object):
 
 # LUMINANCE LUTS
 ASCII_LUTS = {
-    'SIMPLE': LUT(
+    u'SIMPLE': LUT(
         " .'-:;!~*+em68g#WM@",
         [15, 25, 45, 60, 75, 90, 100, 115, 135, 155, 170, 185, 205, 220, 230, 240, 245, 250]
         ),
-    'BINARY': LUT(
+    u'BINARY': LUT(
         " @",
         [128]
     )
@@ -60,21 +60,23 @@ def linear_lut(chars):
 
 
 def get_lut(string):
+    global ASCII_LUTS
+    if PY2:
+        string = string.decode("unicode_escape")
     lut = ASCII_LUTS.get(string.upper(), None)
     if lut:
         print(u"Using predefined LUT '{}'".format(string))
     else:
         print(u"Creating linear LUT from string '{}'".format(string))
-        if PY2:
-            string = string.decode("unicode_escape")
         lut = linear_lut(string)
+        ASCII_LUTS[string.upper()] = lut # cache lookup
 
     return lut
 
 
 def bars(lut):
     """ Draws bars using the specified lut."""
-    chars, lums = get_lut(lut).native_data()
+    chars, lums = get_lut(lut).legacy_lookup()
     chars = list(chars)
     arr = list(range(0, 255, 2))
     line = ""

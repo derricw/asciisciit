@@ -358,7 +358,7 @@ def apply_lut_pil(img, lut="simple"):
 
     text = u"\n"
 
-    chars, lums = get_lut(lut).native_data()
+    chars, lums = get_lut(lut).legacy_lookup()
 
     #SLOW ##TODO: USE Image.point(lut) instead
     for y in range(0, img.size[1]):

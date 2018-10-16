@@ -13,6 +13,13 @@ def test_linear_lut():
     assert(len(l._bins) == 8)
 
 
+def test_get_lut():
+    assert(u"\u3105\u3106\u3107\u3108" not in lut.ASCII_LUTS)
+    l1 = lut.get_lut("\u3105\u3106\u3107\u3108")
+    assert(u"\u3105\u3106\u3107\u3108" in lut.ASCII_LUTS)
+    l2 = lut.get_lut("\u3105\u3106\u3107\u3108")
+
+
 def test_lut():
     with pytest.raises(AssertionError):
         l = lut.LUT("abc", [1])
