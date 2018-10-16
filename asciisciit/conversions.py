@@ -18,7 +18,7 @@ import cv2
 import imageio
 
 from asciisciit.misc import *
-from asciisciit.lut import LUM
+from asciisciit.lut import get_lut
 
 RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
 
@@ -356,10 +356,9 @@ def apply_lut_pil(img, lut="simple"):
     if isinstance(img, np.ndarray):
         img = numpy_to_pil(img)
 
-    text = "\n"
+    text = u"\n"
 
-    chars, lums = LUM[lut.upper()]
-    chars = list(chars)
+    chars, lums = get_lut(lut).native_data()
 
     #SLOW ##TODO: USE Image.point(lut) instead
     for y in range(0, img.size[1]):
@@ -368,10 +367,9 @@ def apply_lut_pil(img, lut="simple"):
             row = bisect(lums, lum)
             character = chars[row]
             text += character
-        text += "\n"
+        text += u"\n"
 
     return text
-
 
 def apply_lut_numpy(img, lut="simple"):
     """
@@ -392,20 +390,10 @@ def apply_lut_numpy(img, lut="simple"):
     if isinstance(img, Image.Image):
         img = np.array(img, dtype=np.uint8)
 
-    chars, lums = LUM[lut.upper()]
-    lums = np.array(lums)
-    if PY2:
-        chars = np.chararray(len(chars), buffer=chars)
-    else:
-        # all my attempts to read the character buffer as unicode failed to
-        # correctly populate the chararray, so here we are...
-        chars = np.chararray(len(chars), buffer=bytes(chars, "utf-8"))
+    lut = get_lut(lut)
+    img_string = u"".join(lut.apply(img).flatten().tolist())
 
-    text = np.chararray((img.shape[0], img.shape[1]+1))
-    text[:,-1] = "\n"
-    text[:,:-1] = chars[np.digitize(img, lums)]
-
-    return "\n" + text.tostring().decode("utf-8")
+    return u"\n" + img_string
 
 
 if __name__ == '__main__':

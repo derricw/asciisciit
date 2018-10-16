@@ -7,7 +7,7 @@ import pytest
 @pytest.mark.parametrize("invert,equalize,lut,lookup_func",
                          itertools.product((True, False),
                                            (True, False),
-                                           ("simple", "binary"),
+                                           ("simple", "binary", "\u3105\u3106\u3107"),
                                            (None, conv.apply_lut_pil)))
 def test_pil_to_ascii(invert, equalize, lut, lookup_func):
     img = np.random.randint(0, 255, (480, 640), dtype=np.uint8)
@@ -21,7 +21,7 @@ def test_pil_to_ascii(invert, equalize, lut, lookup_func):
 @pytest.mark.parametrize("invert,equalize,lut",
                          itertools.product((True, False),
                                            (True, False),
-                                           ("simple", "binary")))
+                                           ("simple", "binary", "\u3105\u3106\u3107")))
 def test_numpy_to_ascii(invert, equalize, lut):
     img = np.random.randint(0, 255, (480, 640), dtype=np.uint8)
     h, w = img.shape
@@ -31,7 +31,7 @@ def test_numpy_to_ascii(invert, equalize, lut):
 
 
 def test_lookup_method_equivalency():
-    img = np.random.randint(0, 255, (300,300), dtype=np.uint8)
+    img = np.random.randint(0, 255, (100,100), dtype=np.uint8)
 
     pil_ascii = conv.apply_lut_pil(img)
     np_ascii = conv.apply_lut_numpy(img)
