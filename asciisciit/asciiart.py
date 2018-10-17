@@ -20,6 +20,7 @@ import cv2
 import numpy as np
 
 from asciisciit.conversions import *
+from asciisciit.lut import get_lut
 import asciisciit.console as console
 
 
@@ -48,12 +49,16 @@ class AsciiImage(object):
     >>> print(ascii)
 
     """
-    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True, lut='simple'):
+    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True, lut='simple', font_path=None):
         self.image = image
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
         self.lut = lut
+        self.font_path = font_path
+        lookup = get_lut(lut)
+        self.aspect_correction_factor = get_aspect_correction_factor(
+            lookup.exemplar, font_path) # default correction factor for converting
 
     @property
     def data(self):
@@ -61,7 +66,8 @@ class AsciiImage(object):
                               self.scalefactor,
                               self.invert,
                               self.equalize,
-                              self.lut)
+                              self.lut,
+                              self.aspect_correction_factor)
     @property
     def size(self):
         return get_ascii_image_size(self.data)
@@ -74,7 +80,7 @@ class AsciiImage(object):
             f.write(self.data)
 
     def render(self, path, font_size=10, bg_color=(20,20,20), fg_color=(255,255,255)):
-        img = ascii_to_pil(self.data, font_size, bg_color, fg_color)
+        img = ascii_to_pil(self.data, font_size, bg_color, fg_color, font_path=self.font_path)
         img.save(path)
 
     def show(self, resize_term=False, rescale=False):
@@ -294,11 +300,13 @@ class AsciiCamera(object):
                  camera_id=0,
                  scalefactor=0.2,
                  invert=False,
-                 equalize=True):
+                 equalize=True,
+                 lut="simple"):
         self.scalefactor = scalefactor
         self.invert = invert
         self.camera_id = camera_id
         self.equalize = equalize
+        self.lut = lut
 
         #webcam?
         self.video = cv2.VideoCapture(self.camera_id)
@@ -321,7 +329,8 @@ class AsciiCamera(object):
                 ascii_img = AsciiImage(image,
                                        scalefactor=self.scalefactor,
                                        invert=self.invert,
-                                       equalize=self.equalize)
+                                       equalize=self.equalize,
+                                       lut=self.lut)
                 #set terminal size on the first image?
                 if frame == 0:
                     try:

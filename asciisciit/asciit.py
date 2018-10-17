@@ -45,10 +45,13 @@ def main():
     parser.add_argument('--e', help='Equalize Histogram', action='store_true')
     parser.add_argument('-f', type=float, help='Target FPS', default=None)
     parser.add_argument('-p', type=int, help='Font render point size', default=10)
+    parser.add_argument('-l', type=str, help='lookup table', default='simple')
+    parser.add_argument('-t', type=str, help='Font path', default=None)
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()
     args = vars(args)
     print(args)
+    l = args['l'].encode().decode(sys.getfilesystemencoding()).encode().decode("unicode_escape")
     #new terminal
     if args['n']:
         sys.argv.remove("--n")
@@ -76,7 +79,7 @@ def main():
         else:
             size = None
         if size and sf:
-            size = (int(size[0]*sf), int(size[1]*sf*ASPECTCORRECTIONFACTOR))
+            size = (int(size[0]*sf), int(size[1]*sf*DEFAULT_ASPECT_CORRECTION_FACTOR))
 
         console.new_term(call_str, size)  # call in new terminal without --n argument
 
@@ -91,7 +94,8 @@ def main():
                 task = AsciiMovie(args['infile'],
                                   scalefactor=args['s'],
                                   invert=args['i'],
-                                  equalize=args['e'])
+                                  equalize=args['e'],
+                                  lut=l)
                 if args['outfile']:
                     task.render(args['outfile'],
                                 fps=args['f'],
@@ -104,7 +108,9 @@ def main():
                 task = AsciiImage(args['infile'],
                                   scalefactor=args['s'],
                                   invert=args['i'],
-                                  equalize=args['e'])
+                                  equalize=args['e'],
+                                  lut=l,
+                                  font_path=args['t'])
                 if args['outfile']:
                     task.render(args['outfile'],
                                 font_size=args['p'])
@@ -119,7 +125,8 @@ def main():
             task = AsciiCamera(args['w'],
                                scalefactor=args['s'],
                                invert=args['i'],
-                               equalize=args['e'])
+                               equalize=args['e'],
+                               lut=l)
             task.stream(fps=args['f'])
             task.release()
 
