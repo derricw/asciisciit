@@ -10,7 +10,6 @@ Conversion functions.
 from bisect import bisect
 import random
 import os
-import sys
 
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 import numpy as np
@@ -18,16 +17,18 @@ import cv2
 import imageio
 
 from asciisciit.misc import *
-from asciisciit.lut import LUM
+from asciisciit.lut import get_lut, relative_width
 
+DEFAULT_ASPECT_CORRECTION_FACTOR = 6.0/11.0
 RESOURCE_DIR = os.path.join(os.path.dirname(__file__),'res')
 
-ASPECTCORRECTIONFACTOR = 6.0/11.0  # because text pixels are rectangular
 
-PY2 = sys.version_info[0] < 3
-
-
-def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True, lut='simple'):
+def image_to_ascii(img,
+                   scalefactor=0.2,
+                   invert=False,
+                   equalize=True,
+                   lut='simple',
+                   aspect_correction_factor=None):
     """
     Generates and ascii string from an image of some kind.
 
@@ -58,7 +59,8 @@ def image_to_ascii(img, scalefactor=0.2, invert=False, equalize=True, lut='simpl
     elif type(img) == np.ndarray:
         img = numpy_to_pil(img)
     try:
-        text = pil_to_ascii(img, scalefactor, invert, equalize, lut)
+        text = pil_to_ascii(img, scalefactor, invert, equalize, lut,
+                            aspect_correction_factor)
     except:
         raise TypeError("That image type doesn't work.  Try PIL, Numpy, or file path...")
     return text
@@ -69,7 +71,7 @@ def pil_to_ascii(img,
                  invert=False,
                  equalize=True,
                  lut='simple',
-                 lookup_func=None
+                 aspect_correction_factor=None
                  ):
     """
     Generates an ascii string from a PIL image.
@@ -87,10 +89,6 @@ def pil_to_ascii(img,
     lut : str
         Name of the lookup table to use. Currently supports 'simple' and
         'binary'.
-    lookup_func : function
-        Method to use to perform lookup. The function should take an image and
-        a lut string and return the converted ascii image. Defaults to
-        `apply_lut_numpy`.
 
     Returns
     -------
@@ -110,10 +108,13 @@ def pil_to_ascii(img,
     >>> print(text_img)
 
     """
-    if lookup_func is None:
-        lookup_func = apply_lut_numpy
-    img = img.resize((int(img.size[0]*scalefactor), 
-        int(img.size[1]*scalefactor*ASPECTCORRECTIONFACTOR)),
+    lookup = get_lut(lut)
+    if aspect_correction_factor is None:
+        aspect_correction_factor = get_aspect_correction_factor(lookup.exemplar)
+
+    img = img.resize(
+        (int(img.size[0]*scalefactor), 
+         int(img.size[1]*scalefactor*aspect_correction_factor)),
         Image.BILINEAR)
     img = img.convert("L")  # convert to mono
     if equalize:
@@ -122,7 +123,9 @@ def pil_to_ascii(img,
     if invert:
         img = ImageOps.invert(img)
 
-    return lookup_func(img, lut)
+    img = np.array(img, dtype=np.uint8)
+
+    return u"\n" + u"".join(lookup.apply(img).flatten().tolist())
 
 
 def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
@@ -156,12 +159,11 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     >>> pil.show()
 
     """
-    #font = ImageFont.load_default()
-    if not font_path:
-        font_path = os.path.join(RESOURCE_DIR, "Cousine-Regular.ttf")
-
-    font = ImageFont.truetype(font_path, font_size)
-    font_width, font_height = font.getsize(" ")  # shape of 1 char
+    font = get_font(font_path, font_size)
+    if relative_width(text[1]) == 2:
+        font_width, font_height = font.getsize(u"\u3000")
+    else:
+        font_width, font_height = font.getsize(u" ")
 
     img_height, img_width = get_ascii_image_size(text)
 
@@ -184,7 +186,8 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     return img
 
 
-def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
+def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10,
+                     font_path=None):
     """ Creates a gif from a sequence of ascii images.
 
         Parameters
@@ -207,7 +210,12 @@ def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
         else:
             #AsciiImage instance
             text = ascii_img.data
-        images.append(ascii_to_pil(text, font_size=font_size))
+        images.append(
+            ascii_to_pil(text,
+                         font_size=font_size,
+                         font_path=font_path
+                        )
+                    )
         status.update(index)
 
     status.complete()
@@ -222,7 +230,8 @@ def numpy_to_ascii(img,
                    scalefactor=0.2,
                    invert=False,
                    equalize=True,
-                   lut="simple"):
+                   lut="simple",
+                   aspect_correction_factor=None):
     """
     Generates an ascii string from a numpy image.
 
@@ -244,11 +253,18 @@ def numpy_to_ascii(img,
     -------
     str
     """
+    lookup = get_lut(lut)
+    if aspect_correction_factor is None:
+        aspect_correction_factor = get_aspect_correction_factor(lookup.exemplar)
     h, w = img.shape
 
-    img=cv2.resize(
-        img, (int(w*scalefactor), int(h*scalefactor*ASPECTCORRECTIONFACTOR))
+    img = cv2.resize(
+        img,
+        (
+            int(w*scalefactor),
+            int(h*scalefactor*aspect_correction_factor)
         )
+    )
 
     if img.ndim == 3: # weak check for RGB
         # works in opencv 3.4.3 but who knows, they keep moving/renaming stuff
@@ -260,7 +276,7 @@ def numpy_to_ascii(img,
     if invert:
         img = 255-img
 
-    return apply_lut_numpy(img, lut)
+    return u"\n" + u"".join(lookup.apply(img).flatten().tolist())
 
 
 def image_to_numpy(path):
@@ -276,6 +292,24 @@ def numpy_to_pil(nparray):
     Numpy matrix to PIL Image.
     """
     return Image.fromarray(nparray)
+
+
+def get_font(font_path=None, font_size=10):
+    if not font_path:
+        font_path = os.path.join(RESOURCE_DIR, "Cousine-Regular.ttf")
+
+    return ImageFont.truetype(font_path, font_size)
+
+
+def get_aspect_correction_factor(exemplar, font_path=None, font_size=10):
+    if font_path is None:
+        factor = relative_width(exemplar)*DEFAULT_ASPECT_CORRECTION_FACTOR
+    else:
+        font = get_font(font_path, font_size)
+        width, height = font.getsize(exemplar)
+        factor = float(width) / height
+
+    return factor
 
 
 def gif_to_numpy(gif_path):
@@ -319,6 +353,7 @@ def gif_to_numpy(gif_path):
         matrix[i] = img
     return matrix, frame_duration
 
+
 def figure_to_numpy(mpl_figure):
     """
     Converts a matplotlib figure to numpy matrix.
@@ -329,83 +364,13 @@ def figure_to_numpy(mpl_figure):
     data = data.reshape(mpl_figure.canvas.get_width_height()[::-1]+ (3,))
     return data
 
+
 def figure_to_ascii(mpl_figure):
     """
     Converts a matplotlib figure to ascii image.
     """
     npy_fig = figure_to_numpy(mpl_figure)
     return image_to_ascii(npy_fig, scalefactor=0.15, invert=False, equalize=False)
-
-
-def apply_lut_pil(img, lut="simple"):
-    """
-    Apply an ascii lookup table to an image by looping over pixels.
-
-    Parameters
-    ----------
-    img : ndarray, PIL.Image
-        Greyscale image to directly apply LUT to.
-    lut : str
-        Name of the lookup table to use. Currently supports 'simple' and
-        'binary'.
-
-    Returns
-    -------
-    str
-    """
-    if isinstance(img, np.ndarray):
-        img = numpy_to_pil(img)
-
-    text = "\n"
-
-    chars, lums = LUM[lut.upper()]
-    chars = list(chars)
-
-    #SLOW ##TODO: USE Image.point(lut) instead
-    for y in range(0, img.size[1]):
-        for x in range(0, img.size[0]):
-            lum = img.getpixel((x, y))
-            row = bisect(lums, lum)
-            character = chars[row]
-            text += character
-        text += "\n"
-
-    return text
-
-
-def apply_lut_numpy(img, lut="simple"):
-    """
-    Apply an ascii lookup table to an image using numpy chararrays.
-
-    Parameters
-    ----------
-    img : ndarray, PIL.Image
-        Greyscale image to directly apply LUT to.
-    lut : str
-        Name of the lookup table to use. Currently supports 'simple' and
-        'binary'.
-
-    Returns
-    -------
-    str
-    """
-    if isinstance(img, Image.Image):
-        img = np.array(img, dtype=np.uint8)
-
-    chars, lums = LUM[lut.upper()]
-    lums = np.array(lums)
-    if PY2:
-        chars = np.chararray(len(chars), buffer=chars)
-    else:
-        # all my attempts to read the character buffer as unicode failed to
-        # correctly populate the chararray, so here we are...
-        chars = np.chararray(len(chars), buffer=bytes(chars, "utf-8"))
-
-    text = np.chararray((img.shape[0], img.shape[1]+1))
-    text[:,-1] = "\n"
-    text[:,:-1] = chars[np.digitize(img, lums)]
-
-    return "\n" + text.tostring().decode("utf-8")
 
 
 if __name__ == '__main__':
