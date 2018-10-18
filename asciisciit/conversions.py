@@ -160,7 +160,10 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
 
     """
     font = get_font(font_path, font_size)
-    font_width, font_height = font.getsize(text[1]) # skip leading \n
+    if relative_width(text[1]) == 2:
+        font_width, font_height = font.getsize(u"\u3000")
+    else:
+        font_width, font_height = font.getsize(u" ")
 
     img_height, img_width = get_ascii_image_size(text)
 
