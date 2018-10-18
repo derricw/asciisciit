@@ -104,7 +104,6 @@ def main():
                 else:
                     task.play(repeats=args['r'],
                               fps=args['f'])
-                    input("")
             elif ext in IMAGES:
                 task = AsciiImage(args['infile'],
                                   scalefactor=args['s'],
@@ -117,7 +116,6 @@ def main():
                                 font_size=args['p'])
                 else:
                     task.show()
-                    input("")
             else:
                 print("Unknown file format.Try:", MOVIES+IMAGES+GIFS)
 

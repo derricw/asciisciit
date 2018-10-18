@@ -22,12 +22,12 @@ from PIL import Image
 def open_pil_img(path, *args, **kwargs):
     """
     Opens a PIL image from a file or the web. We have to do this because
-        PIL doesn't (yet) support web paths.
+        PIL doesn't (yet) support urls.
 
     Parameters
     ----------
     path : str
-        File or web path to open
+        File or url to open
 
     All other arguments are passed to Image.open()
 

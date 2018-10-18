@@ -143,7 +143,7 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     bg_color : tuple (20,20,20)
         (R,G,B) values for image background.
     fg_color : tuple (255,255,255)
-        (R,G,B) values for text color.
+        (R,G,B) values for text color. -1 gets value from image.
     font_path : str
         Use a custom font .ttf file.
 

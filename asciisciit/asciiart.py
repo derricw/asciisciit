@@ -57,7 +57,7 @@ class AsciiImage(object):
                  equalize=True,
                  lut='simple',
                  font_path=None):
-        self.image = image
+        self.image = open_pil_img(image) if isinstance(image, str) else image
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
