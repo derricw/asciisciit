@@ -15,12 +15,13 @@ import time
 import os
 import platform
 from subprocess import Popen, PIPE
+import io
 
 import cv2
 import numpy as np
 
 from asciisciit.conversions import *
-from asciisciit.lut import get_lut
+from asciisciit.lut import get_lut, PY2
 import asciisciit.console as console
 
 
@@ -49,16 +50,21 @@ class AsciiImage(object):
     >>> print(ascii)
 
     """
-    def __init__(self, image, scalefactor=0.1, invert=False, equalize=True, lut='simple', font_path=None):
+    def __init__(self,
+                 image,
+                 scalefactor=0.1,
+                 invert=False,
+                 equalize=True,
+                 lut='simple',
+                 font_path=None):
         self.image = image
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
-        self.lut = lut
         self.font_path = font_path
-        lookup = get_lut(lut)
-        self.aspect_correction_factor = get_aspect_correction_factor(
-            lookup.exemplar, font_path) # default correction factor for converting
+        self.aspect_correction_factor = DEFAULT_ASPECT_CORRECTION_FACTOR
+        self._lut = None
+        self.lut = lut
 
     @property
     def data(self):
@@ -68,15 +74,32 @@ class AsciiImage(object):
                               self.equalize,
                               self.lut,
                               self.aspect_correction_factor)
+
     @property
     def size(self):
         return get_ascii_image_size(self.data)
 
+    @property
+    def lut(self):
+        return self._lut
+
+    @lut.setter
+    def lut(self, val):
+        self._lut = val
+        lookup = get_lut(val)
+        self.aspect_correction_factor = get_aspect_correction_factor(
+            lookup.exemplar, self.font_path) # default correction factor for converting
+
     def __repr__(self):
+        if PY2:
+            return self.data.encode('utf-8') # error otherwise
+        return self.data
+
+    def __unicode__(self):
         return self.data
 
     def to_file(self, path):
-        with open(path, "w+") as f:
+        with io.open(path, "w+") as f:
             f.write(self.data)
 
     def render(self, path, font_size=10, bg_color=(20,20,20), fg_color=(255,255,255)):
@@ -118,18 +141,22 @@ class AsciiMovie(object):
                  scalefactor=0.2,
                  invert=False,
                  equalize=True,
-                 lut='simple'):
+                 lut='simple',
+                 font_path=None):
 
         self.movie_path = movie_path
         self.scalefactor = scalefactor
         self.invert = invert
         self.equalize = equalize
+        self.font_path = font_path
+        self.aspect_correction_factor = DEFAULT_ASPECT_CORRECTION_FACTOR
+        self._lut = lut
         self.lut = lut
         self.default_fps = 15.0
 
         if type(self.movie_path) == str:
             # movie is a file
-            _,ext = os.path.splitext(self.movie_path)
+            _ , ext = os.path.splitext(self.movie_path)
 
             if ext == ".gif":
                 self.data, frame_duration = gif_to_numpy(self.movie_path)
@@ -140,23 +167,37 @@ class AsciiMovie(object):
             elif ext in  [".mp4", ".avi"]:
                 self.play = self._play_movie
                 self.render = self._render_to_movie
-                #self.shape = 
         else:
             raise("movie_path must be a string")
 
         self.frame_intervals = []
         self.draw_times = []
 
+    @property
+    def lut(self):
+        return self._lut
+
+    @lut.setter
+    def lut(self, val):
+        self._lut = val
+        lookup = get_lut(val)
+        self.aspect_correction_factor = get_aspect_correction_factor(
+            lookup.exemplar, self.font_path) # default correction factor for converting
+
     def _play_gif(self, fps=None, repeats=-1):
         fps = fps or self.default_fps
-        seq = generateSequence(self.data, scalefactor=self.scalefactor,
-            equalize=self.equalize, lut=self.lut)
+        seq = generate_sequence(self.data,
+                                scalefactor=self.scalefactor,
+                                invert=self.invert,
+                                equalize=self.equalize,
+                                lut=self.lut,
+                                font_path=self.font_path)
         if repeats < 0:
             while True:
-                playSequence(seq, fps)
+                play_sequence(seq, fps)
         else:
             for i in range(repeats):
-                playSequence(seq, fps)
+                play_sequence(seq, fps)
 
     def _play_movie(self, fps=None, repeats=1):
         fps = fps or self.default_fps
@@ -176,7 +217,8 @@ class AsciiMovie(object):
                                            scalefactor=self.scalefactor,
                                            invert=self.invert,
                                            equalize=self.equalize,
-                                           lut=self.lut)
+                                           lut=self.lut,
+                                           font_path=self.font_path)
                     #set terminal size on the first image?
                     if frame == 0:
                         try:
@@ -218,8 +260,17 @@ class AsciiMovie(object):
 
         """
         fps = fps or self.default_fps
-        seq = generateSequence(self.data, scalefactor=self.scalefactor)
-        ascii_seq_to_gif(seq, output_path, fps=fps, font_size=font_size)
+        seq = generate_sequence(self.data,
+                                scalefactor=self.scalefactor,
+                                invert=self.invert,
+                                equalize=self.equalize,
+                                lut=self.lut,
+                                font_path=self.font_path)
+        ascii_seq_to_gif(seq,
+                         output_path,
+                         fps=fps,
+                         font_size=font_size,
+                         font_path=self.font_path)
 
     def _render_to_movie(self,
                          output_path,
@@ -244,8 +295,11 @@ class AsciiMovie(object):
                 #get resulting image size once
                 ascii_img = AsciiImage(frame,
                                        scalefactor=self.scalefactor,
-                                       invert=self.invert)
-                pil_img = ascii_to_pil(ascii_img.data)
+                                       invert=self.invert,
+                                       equalize=self.equalize,
+                                       lut=self.lut,
+                                       font_path=self.font_path)
+                pil_img = ascii_to_pil(ascii_img.data, font_path=self.font_path)
                 img_size = pil_img.size
             frames += 1
             status.update_custom(frames)
@@ -276,9 +330,12 @@ class AsciiMovie(object):
                 ascii_img = AsciiImage(frame,
                                        scalefactor=self.scalefactor,
                                        invert=self.invert,
-                                       equalize=self.equalize)
+                                       equalize=self.equalize,
+                                       lut=self.lut,
+                                       font_path=self.font_path)
                 pil_img = ascii_to_pil(ascii_img.data,
-                                       font_size=font_size)
+                                       font_size=font_size,
+                                       font_path=self.font_path)
                 pil_img.save(p.stdin, 'JPEG')
                 #numpy_img = np.array(pil_img)
                 #output.write(numpy_img)  # opencv
@@ -334,7 +391,7 @@ class AsciiCamera(object):
                 #set terminal size on the first image?
                 if frame == 0:
                     try:
-                        set_terminal_size(ascii_img.size)
+                        console.set_terminal_size(ascii_img.size)
                     except:
                         pass
                 console.clear_term()
@@ -365,15 +422,28 @@ class AsciiCamera(object):
         self.video.release()
 
 
-def generateSequence(imageseq, scalefactor=0.1, equalize=True, lut='simple'):
+def generate_sequence(imageseq,
+                      scalefactor=0.1,
+                      invert=False,
+                      equalize=True,
+                      lut='simple',
+                      font_path=None):
     seq = []
     for im in imageseq:
-        seq.append(AsciiImage(im, scalefactor,
-            equalize=equalize, lut=lut))
+        seq.append(
+            AsciiImage(
+                im,
+                scalefactor,
+                invert=invert,
+                equalize=equalize,
+                lut=lut,
+                font_path=font_path
+            )
+        )
     return seq
 
 
-def playSequence(seq, fps=30, repeats=1):
+def play_sequence(seq, fps=30, repeats=1):
     shape = seq[0].size
     console.set_terminal_size(shape)
     t = time.clock()
@@ -385,7 +455,6 @@ def playSequence(seq, fps=30, repeats=1):
         remaining = 1.0/fps-interval
         if remaining > 0:
             time.sleep(remaining)
-
 
 
 if __name__ == '__main__':

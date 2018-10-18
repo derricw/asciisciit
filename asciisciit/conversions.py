@@ -161,10 +161,8 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     """
     font = get_font(font_path, font_size)
     font_width, font_height = font.getsize(text[1]) # skip leading \n
-    print(font_width, font_height)
 
     img_height, img_width = get_ascii_image_size(text)
-    print(img_height, img_width)
 
     y_padding = 1
 
@@ -185,7 +183,8 @@ def ascii_to_pil(text, font_size=10, bg_color=(20, 20, 20),
     return img
 
 
-def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
+def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10,
+                     font_path=None):
     """ Creates a gif from a sequence of ascii images.
 
         Parameters
@@ -208,7 +207,12 @@ def ascii_seq_to_gif(seq, output_path, fps=15.0, font_size=10):
         else:
             #AsciiImage instance
             text = ascii_img.data
-        images.append(ascii_to_pil(text, font_size=font_size))
+        images.append(
+            ascii_to_pil(text,
+                         font_size=font_size,
+                         font_path=font_path
+                        )
+                    )
         status.update(index)
 
     status.complete()

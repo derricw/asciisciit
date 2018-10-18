@@ -31,6 +31,36 @@ MOVIES = [".mp4", '.avi', '.mpg', '.mpeg']
 IMAGES = ['.png', '.jpeg', '.jpg', '.tif', '.bmp']
 GIFS = ['.gif']
 
+
+def run_in_new_terminal(**args):
+    sys.argv.remove("--n")
+    call_str = " ".join(sys.argv)
+
+    # have to get the size here because we have to set linux terminal size
+    # when we instantiate the terminal because i can't figure out how
+    # to do it after the terminal is created like we do in Winderps
+    sf = args['s']
+    if args['w'] > -1:
+        size = get_movie_size_pix(args['w'])
+    elif args['infile']:
+        infile = args['infile']
+        _ , ext = os.path.splitext(infile)
+        ext = ext.lower()
+        if ext in MOVIES:
+            size = get_movie_size_pix(infile)
+        elif ext in GIFS:
+            size = get_gif_size_pix(infile)
+        elif ext in IMAGES:
+            size = get_img_size_pix(infile)
+        else:
+            size = None
+    else:
+        size = None
+    if size and sf:
+        size = (int(size[0]*sf), int(size[1]*sf*DEFAULT_ASPECT_CORRECTION_FACTOR))
+
+    console.new_term(call_str, size)  # call in new terminal without --n argument
+
 def main():
     parser = argparse.ArgumentParser(
         description='Convert Images, Movies, Gifs, Plots to ASCII')
@@ -51,41 +81,11 @@ def main():
     args = parser.parse_args()
     args = vars(args)
     print(args)
-    l = args['l'].encode().decode(sys.getfilesystemencoding()).encode().decode("unicode_escape")
     #new terminal
     if args['n']:
-        sys.argv.remove("--n")
-        call_str = " ".join(sys.argv)
-
-        #have to get the size here because we have to set linux terminal size
-        #   when we instantiate the terminal because i can't figure out how
-        #   to do it after the terminal is created like we do in Winderps
-        sf = args['s']
-        if args['w'] > -1:
-            size = get_movie_size_pix(args['w'])
-            
-        elif args['infile']:
-            infile = args['infile']
-            _,ext = os.path.splitext(infile)
-            ext = ext.lower()
-            if ext in MOVIES:
-                size = get_movie_size_pix(infile)
-            elif ext in GIFS:
-                size = get_gif_size_pix(infile)
-            elif ext in IMAGES:
-                size = get_img_size_pix(infile)
-            else:
-                size = None
-        else:
-            size = None
-        if size and sf:
-            size = (int(size[0]*sf), int(size[1]*sf*DEFAULT_ASPECT_CORRECTION_FACTOR))
-
-        console.new_term(call_str, size)  # call in new terminal without --n argument
-
+        run_in_new_terminal(**args)
     #same terminal
     else:
-
         #a file to open?
         if args['infile']:
             _,ext = os.path.splitext(args['infile'])
@@ -95,7 +95,8 @@ def main():
                                   scalefactor=args['s'],
                                   invert=args['i'],
                                   equalize=args['e'],
-                                  lut=l)
+                                  lut=args['l'],
+                                  font_path=args['t'])
                 if args['outfile']:
                     task.render(args['outfile'],
                                 fps=args['f'],
@@ -109,7 +110,7 @@ def main():
                                   scalefactor=args['s'],
                                   invert=args['i'],
                                   equalize=args['e'],
-                                  lut=l,
+                                  lut=args['l'],
                                   font_path=args['t'])
                 if args['outfile']:
                     task.render(args['outfile'],
@@ -126,7 +127,7 @@ def main():
                                scalefactor=args['s'],
                                invert=args['i'],
                                equalize=args['e'],
-                               lut=l)
+                               lut=args['l'])
             task.stream(fps=args['f'])
             task.release()
 
