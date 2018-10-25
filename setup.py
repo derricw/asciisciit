@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import os, sys, glob, fnmatch
 
 setup(name="asciisciit",
-      version='0.2.1',
+      version='0.3.0',
       description="asciisciit is a Python toolbox for displaying and converting images, movies, and camera feeds into ascii.",
       long_description="""asciisciit is a Python toolbox for displaying and
       converting images, movies, gifs, and webcam feeds into ASCII.  It uses

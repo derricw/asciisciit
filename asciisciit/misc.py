@@ -44,6 +44,13 @@ def open_pil_img(path, *args, **kwargs):
 
 
 def get_movie_size_pix(movie_path):
+    """
+    Gets frame resolution for a movie.
+
+    Returns
+    -------
+    tuple : (x, y)
+    """
     video = cv2.VideoCapture(movie_path)
     _, frame = video.read()
     shape = frame.shape
@@ -52,12 +59,26 @@ def get_movie_size_pix(movie_path):
 
 
 def get_gif_size_pix(gif_path):
+    """
+    Gets the resolution of a gif.
+
+    Returns
+    -------
+    tuple : (x, y)
+    """
     gif = open_pil_img(gif_path)
     shape = gif.size
     return (shape[0], shape[1])
 
 
 def get_img_size_pix(img_path):
+    """
+    Gets the resolution of an image.
+
+    Returns
+    -------
+    tuple : (x, y)
+    """
     img = open_pil_img(img_path)
     shape = img.size
     return (shape[0], shape[1])
@@ -71,6 +92,13 @@ def get_ascii_image_size(text):
 
 
 def get_length_of_gif(gif):
+    """
+    Gets the length of an gif.
+
+    Returns
+    -------
+    int : number of frames in a gif.
+    """
     if type(gif) == str:
         gif = open_pil_img(gif)
     else:
@@ -87,7 +115,9 @@ def get_length_of_gif(gif):
 
 
 class StatusBar(object):
-
+    """
+    Simple status bar.
+    """
     def __init__(self, length=0, text=""):
         self.length = length
         self.text = text

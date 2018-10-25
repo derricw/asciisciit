@@ -1,5 +1,5 @@
 matplotlib
-pillow >= 2.0
+pillow
 numpy
 opencv-python
 imageio

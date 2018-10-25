@@ -164,7 +164,7 @@ class AsciiMovie(object):
                 self.shape = self.data.shape
                 self.play = self._play_gif
                 self.render = self._render_to_gif
-            elif ext in  [".mp4", ".avi"]:
+            elif ext in  [".mp4", ".avi", ".mpeg", ".mpg"]:
                 self.play = self._play_movie
                 self.render = self._render_to_movie
         else:

@@ -80,7 +80,7 @@ def main():
     parser.add_argument('--n', help='New terminal', action='store_true')
     args = parser.parse_args()
     args = vars(args)
-    print(args)
+
     #new terminal
     if args['n']:
         run_in_new_terminal(**args)
