@@ -446,12 +446,12 @@ def generate_sequence(imageseq,
 def play_sequence(seq, fps=30, repeats=1):
     shape = seq[0].size
     console.set_terminal_size(shape)
-    t = time.clock()
+    t = time.time()
     for im in seq:
         console.clear_term()
         print(im)
-        interval = time.clock()-t
-        t = time.clock()
+        interval = time.time()-t
+        t = time.time()
         remaining = 1.0/fps-interval
         if remaining > 0:
             time.sleep(remaining)
